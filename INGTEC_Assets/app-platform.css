@@ -1,0 +1,20 @@
+:root{--platform-success:#5f7600;--platform-danger:#b42318}
+/* Die App besitzt gezielte horizontale Scroller (Tabellen/Kalender). Der
+   Hauptbereich selbst darf dadurch weder Desktop noch Mobil verbreitern. */
+.app>main{max-width:100%;overflow-x:hidden}.app>main>.content{max-width:100%}
+:root[data-network="offline"] .sync,:root[data-network="offline"] .sync-button{border-color:#d99000!important}
+.platform-health-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:12px;margin-top:18px}.platform-health-card h3{margin:4px 0}.platform-health-card p{margin:0;font-size:12px}.platform-health-state{display:inline-flex;align-items:center;min-height:30px;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:850}.platform-health-state.is-ok{background:#edf6d4;color:var(--platform-success)}.platform-health-state.is-error{background:#fff0ed;color:var(--platform-danger)}.platform-health-actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.platform-health-actions button{min-height:40px}
+:root[data-theme="dark"] .platform-health-state.is-ok{background:#34461f;color:#dff0a7}:root[data-theme="dark"] .platform-health-state.is-error{background:#4a2624;color:#ffd2cc}
+@media(max-width:760px){.platform-health-card{grid-template-columns:1fr}.platform-health-state{width:max-content}.platform-health-actions{display:grid;grid-template-columns:1fr}.platform-health-actions button{width:100%}}
+@media(max-width:760px){
+  header{gap:8px!important;min-width:0!important;padding:10px 12px!important;overflow:hidden}
+  header>.workspace-page-heading{flex:1 1 0;min-width:0!important;overflow:hidden}
+  header>.workspace-page-heading h1{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:18px!important}
+  header>.workspace-page-heading .workspace-breadcrumb{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  header .workspace-mobile-search,header .workspace-notifications,header .sync-button,header #userProfileButton{flex:0 0 44px;width:44px;min-width:44px;height:44px;margin:0;padding:0;justify-content:center}
+  header .workspace-notifications,header .sync-button{font-size:0!important;white-space:nowrap}
+  header .workspace-notifications::before{content:'🔔';font-size:16px;line-height:1}
+  header .sync-button::before{content:'↻';font-size:20px;line-height:1}
+}
+@media(max-width:430px){header #userProfileButton{display:none!important}}
+.platform-qa-panel{position:fixed;z-index:5000;right:16px;bottom:16px;display:grid;gap:3px;max-width:min(420px,calc(100vw - 32px));padding:13px 15px;border:1px solid #75940d;border-radius:13px;background:#eff7d7;color:#334600;box-shadow:0 16px 38px rgba(16,24,40,.2)}.platform-qa-panel b{font-size:13px}.platform-qa-panel span,.platform-qa-panel small{font-size:11px;line-height:1.4}:root[data-all-tests="failed"] .platform-qa-panel{border-color:#c7463c;background:#fff0ed;color:#8f271f}:root[data-theme="dark"] .platform-qa-panel{background:#30401e;color:#e4f2b5}

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 84" role="img" aria-labelledby="title description">
+  <title id="title">INGTEC</title>
+  <desc id="description">INGTEC – Technik wirkt</desc>
+  <rect width="500" height="84" fill="#ffffff"/>
+  <g fill="#adca00">
+    <path d="M8 68 43 8l24 18-31 42Z"/>
+    <path d="m81 68 35-60 24 18-31 42Z"/>
+  </g>
+  <path fill="#1d1d1b" d="m44 68 35-60 24 18-31 42Z"/>
+  <text x="142" y="57" fill="#1d1d1b" font-family="Arial Black,Arial,sans-serif" font-size="55" font-style="italic" font-weight="900" letter-spacing="-4">INGTEC</text>
+  <text x="147" y="76" fill="#5b6167" font-family="Arial,Helvetica,sans-serif" font-size="12" font-weight="700" letter-spacing="2.4">TECHNIK. WIRKT</text>
+</svg>

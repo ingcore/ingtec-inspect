@@ -1,0 +1,22 @@
+/* Gemeinsame App-Shell-Ergänzungen: schneller App-Wechsel. */
+.ingtec-app-switcher{position:fixed;z-index:1200;top:74px;left:max(18px,calc((100vw - 1180px)/2));width:min(560px,calc(100vw - 36px));max-height:min(680px,calc(100dvh - 96px));overflow:auto;padding:18px;border:1px solid #dbe2e7;border-radius:20px;background:#fff;box-shadow:0 22px 62px rgba(16,24,40,.24);color:var(--ink)}
+.ingtec-app-switcher[hidden]{display:none}
+.ingtec-app-switcher-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.ingtec-app-switcher-head h2{margin:3px 0 0;font-size:21px}
+.ingtec-app-switcher-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:16px}
+.ingtec-app-switcher-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;min-height:72px;padding:11px;border:1px solid #e1e7eb;border-radius:14px;background:#fbfcfd;color:var(--ink);text-align:left;cursor:pointer}
+.ingtec-app-switcher-card:hover,.ingtec-app-switcher-card:focus-visible{border-color:#a8c95d;background:#f6faeb;outline:none}
+.ingtec-app-switcher-card.is-active{border-color:#92ba36;background:#f2f8e1;box-shadow:inset 0 0 0 1px rgba(115,151,32,.15)}
+.ingtec-app-switcher-card b,.ingtec-app-switcher-card small{display:block}
+.ingtec-app-switcher-card b{font-size:12px;line-height:1.25}
+.ingtec-app-switcher-card small{display:-webkit-box;overflow:hidden;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.35;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.ingtec-app-switcher-code{display:grid;place-items:center;align-self:start;min-width:34px;height:28px;padding:0 4px;border-radius:8px;background:#eaf1d7;color:#435b08;font-size:9px;font-weight:900;letter-spacing:.02em}
+.ingtec-app-switcher-foot{display:flex;justify-content:flex-end;margin-top:16px;padding-top:13px;border-top:1px solid #e8ecef}
+:root[data-theme="dark"] .ingtec-app-switcher{border-color:#3a444f;background:#202730;color:#edf2f5;box-shadow:0 22px 62px rgba(0,0,0,.45)}
+:root[data-theme="dark"] .ingtec-app-switcher-card{border-color:#3a444f;background:#192027;color:#edf2f5}
+:root[data-theme="dark"] .ingtec-app-switcher-card:hover,:root[data-theme="dark"] .ingtec-app-switcher-card:focus-visible,:root[data-theme="dark"] .ingtec-app-switcher-card.is-active{border-color:#698d2f;background:#2d3920}
+:root[data-theme="dark"] .ingtec-app-switcher-code{background:#34451e;color:#e5f2b8}
+@media(max-width:760px){
+  .ingtec-app-switcher{top:66px;left:12px;width:calc(100vw - 24px);max-height:calc(100dvh - 82px);padding:14px;border-radius:17px}
+  .ingtec-app-switcher-list{grid-template-columns:1fr}
+}

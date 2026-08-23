@@ -1,0 +1,19 @@
+{
+  "name": "INGTEC Inspect Enterprise",
+  "short_name": "INGTEC Inspect",
+  "description": "Prüf- und Auftragsplattform für den INGTEC-Fachprozess.",
+  "lang": "de-AT",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#101419",
+  "theme_color": "#9DC31A",
+  "icons": [
+    {
+      "src": "INGTEC_Assets/ingtec-logo-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
