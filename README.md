@@ -16,7 +16,7 @@ Dies ist der eingefrorene HTML/JS-Prototyp mit Demodaten (lokale Speicherung im 
 Keine Abhängigkeiten, kein Package Manager, kein Build. Repository klonen:
 
 ```bash
-git clone https://github.com/<dein-github-user>/ingtec-inspect.git
+git clone https://github.com/ingcore/ingtec-inspect.git
 cd ingtec-inspect
 ```
 
@@ -44,13 +44,11 @@ Keine. Die Anwendung macht keine Netzwerk-/API-Aufrufe und benötigt keine Umgeb
 
 Statisches Hosting über **GitHub Pages**, automatisiert per GitHub Actions (`.github/workflows/pages.yml`): jeder Push auf `main` baut kein Artefakt (nicht nötig), sondern veröffentlicht den Repository-Inhalt direkt über `actions/upload-pages-artifact` + `actions/deploy-pages`.
 
-Alle Asset-Pfade (`INGTEC_Assets/...`, Manifest-Icons, Service-Worker-Registrierung) sind relativ, daher funktioniert die App unverändert unter dem GitHub-Pages-Unterpfad `https://<user>.github.io/ingtec-inspect/`.
+Alle Asset-Pfade (`INGTEC_Assets/...`, Manifest-Icons, Service-Worker-Registrierung) sind relativ, daher funktioniert die App unverändert unter dem GitHub-Pages-Unterpfad `https://ingcore.github.io/ingtec-inspect/`.
 
 ## Live-Version
 
-`https://<dein-github-user>.github.io/ingtec-inspect/`
-
-*(Die exakte URL wird nach der ersten erfolgreichen Aktivierung von GitHub Pages ergänzt.)*
+**https://ingcore.github.io/ingtec-inspect/**
 
 ## Hinweise zu Produktionsgrenzen
 
