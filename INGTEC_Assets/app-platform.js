@@ -1,8 +1,8 @@
 (()=>{
   'use strict';
 
-  const VERSION='2.2.0';
-  const SCHEMA_VERSION=2;
+  const VERSION='2.3.0';
+  const SCHEMA_VERSION=3;
   const STORAGE_KEY='ingtecEnterprise';
   const BACKUP_KEY='ingtecEnterprise.backup';
   const CHECKPOINT_KEY='ingtecEnterprise.checkpoint';
@@ -10,7 +10,7 @@
   const FILE_DB_NAME='ingtec-platform-files';
   const FILE_STORE='files';
   const MAX_LOCAL_BYTES=4.5*1024*1024;
-  const ARRAY_KEYS=['orders','projects','completedProjects','inspections','findings','measures','documents','calendarEvents','auditLog','safetyScoreHistory','profiles','userAccounts','customAccessRoles'];
+  const ARRAY_KEYS=['orders','projects','completedProjects','inspections','findings','measures','documents','invoices','calendarEvents','auditLog','safetyScoreHistory','profiles','userAccounts','customAccessRoles'];
   const ALLOWED_INSPECTION_STATES=['Vorbereitung','In Bearbeitung','In QS','Technisch freigegeben','Finalisiert'];
   const BLOCKED_FILE_EXTENSIONS=new Set(['html','htm','svg','js','mjs','cjs','exe','dll','bat','cmd','ps1','sh','jar','msi']);
   const ALLOWED_FILE_EXTENSIONS=new Set(['pdf','jpg','jpeg','png','webp','heic','doc','docx','xls','xlsx','csv','txt','msg','eml','dwg','dxf']);
@@ -57,7 +57,7 @@
     const errors=[],warnings=[];
     if(!isObject(candidate))return {ok:false,errors:['Der Anwendungszustand ist kein Objekt.'],warnings,checkedAt:now()};
     ARRAY_KEYS.forEach(key=>{if(candidate[key]!=null&&!Array.isArray(candidate[key]))errors.push(key+' muss eine Liste sein.');});
-    ['orders','projects','completedProjects','inspections','findings','measures','documents'].forEach(key=>{
+    ['orders','projects','completedProjects','inspections','findings','measures','documents','invoices'].forEach(key=>{
       const duplicates=duplicateIds(candidate[key]);
       if(duplicates.length)errors.push(key+': doppelte Kennungen '+duplicates.join(', '));
     });
@@ -344,12 +344,13 @@
       ['Feststellungen',window.__INGTEC_FINDING_TESTS__],
       ['Maßnahmen',window.__INGTEC_MEASURE_TESTS__],
       ['Termine',window.__INGTEC_CALENDAR_TESTS__],
+      ['Abrechnung',window.__INGTEC_BILLING_TESTS__],
       ['Hub',window.__INGTEC_HUB_TESTS__],
       ['Zusammenarbeit',window.__INGTEC_COLLABORATION_TESTS__]
     ];
     try{if(typeof window.runWorkspaceContractTests==='function')suites.push(['Vertrag',window.runWorkspaceContractTests()]);}catch(error){suites.push(['Vertrag',{passed:false,tests:[{name:error.message,passed:false}]}]);}
     const tests=suites.flatMap(([suite,result])=>asArray(result?.tests).map(test=>({suite,name:test.name,passed:Boolean(test.passed)})));
-    tests.push({suite:'Shell',name:'Alle Fach-Stylesheets geladen',passed:['inspection-workspace.css','finding-workspace.css','measure-workspace.css','daily-workspace.css','collaboration-suite.css','app-platform.css','calendar-zoom-timeline.css'].every(name=>[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes(name)))});
+    tests.push({suite:'Shell',name:'Alle Fach-Stylesheets geladen',passed:['inspection-workspace.css','finding-workspace.css','measure-workspace.css','billing-workspace.css','daily-workspace.css','collaboration-suite.css','app-platform.css','calendar-zoom-timeline.css'].every(name=>[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes(name)))});
     tests.push({suite:'Shell',name:'Hub-Startauswahl vollständig geladen',passed:Boolean(window.INGTECHub)&&[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes('hub-launcher.css'))});
     tests.push({suite:'Shell',name:'Manifest ist verknüpft',passed:Boolean(document.querySelector('link[rel="manifest"]'))});
     tests.push({suite:'Shell',name:'INGTEC-Hauptfarbe bleibt erhalten',passed:getComputedStyle(document.documentElement).getPropertyValue('--ing').trim().toUpperCase()==='#9DC31A'});

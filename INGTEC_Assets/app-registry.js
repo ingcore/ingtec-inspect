@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const VERSION='1.0.0';
+  const VERSION='1.1.0';
   const GROUPS=[
     {id:'work',label:'Arbeit & Prüfung',description:'Operative Arbeit vom Auftrag bis zur Freigabe.'},
     {id:'planning',label:'Planung & Zusammenarbeit',description:'Termine, Zusammenarbeit und freigegebene Kundensicht.'},
@@ -144,8 +144,10 @@
     },
     {
       id:'abrechnung',code:'APP-11',slug:'abrechnung',name:'Abrechnung',
-      description:'Integration noch nicht konfiguriert.',icon:'billing',group:'quality',
-      enabled:false,navigation:[]
+      description:'Lokale Abrechnungsvorbereitung, offene Vorgänge und Zahlungseingänge im Blick.',
+      icon:'billing',page:'billing',group:'quality',navigation:[
+        {id:'overview',label:'Abrechnung',page:'billing',icon:'billing',path:''}
+      ],legacyIds:['billing','invoices']
     },
     {
       id:'academy',code:'APP-19',slug:'academy',name:'INGTEC Academy',
@@ -231,7 +233,7 @@
       dashboard:'arbeitsplatz',orders:'auftraege',calendar:'termine',master:'kunden-objekte',
       inspection:'pruefungen',findings:'pruefungen',measures:'pruefungen',reports:'berichte',
       intelligence:'safety-score',knowledge:'wissen',chats:'teamarbeit',documents:'dokumente',
-      customer:'kundenportal',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
+      customer:'kundenportal',billing:'abrechnung',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
     }[page];
     const chosen=candidates.find(candidate=>candidate.app.id===preferred)||candidates[0];
     return context(chosen.app,chosen.item.id);
@@ -277,7 +279,8 @@
       {name:'Prüfungen besitzt die fachliche Seitennavigation',passed:inspection?.app?.id==='pruefungen'&&inspection?.item?.page==='findings'},
       {name:'Teamarbeit mappt Aufgaben auf den bestehenden Collaboration-Bereich',passed:teamwork?.app?.id==='teamarbeit'&&teamwork?.item?.collabArea==='tasks'},
       {name:'Bestehende Prüfungslinks werden in den App-Kontext überführt',passed:legacy?.app?.id==='pruefungen'},
-      {name:'Deaktivierte Fachmodule bleiben registriert',passed:comingSoonApps().length>=4}
+      {name:'Abrechnung ist als eigene Fach-App aktiviert',passed:appFor('abrechnung')?.enabled!==false&&appFor('abrechnung')?.navigation?.[0]?.page==='billing'},
+      {name:'Weitere geplante Fachmodule bleiben registriert',passed:comingSoonApps().length>=3}
     ];
     return {passed:tests.every(test=>test.passed),tests,runAt:new Date().toISOString()};
   };

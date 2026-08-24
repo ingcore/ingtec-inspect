@@ -1,0 +1,50 @@
+/* Die umfangreiche Feststellungserfassung folgt dem gleichen zentrierten
+   Modal-Muster wie die übrigen Anlegen-Dialoge. */
+.finding-drawer-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:grid;
+  place-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(16,24,40,.42);
+  backdrop-filter:blur(7px);
+  animation:modalFadeIn 180ms ease both;
+}
+
+.finding-drawer{
+  display:flex;
+  width:min(1080px,calc(100vw - 40px));
+  height:min(900px,calc(100dvh - 40px));
+  max-height:calc(100dvh - 40px);
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.8);
+  border-radius:22px;
+  background:#f5f7f8;
+  color:var(--ink);
+  box-shadow:0 28px 70px rgba(16,24,40,.28);
+  animation:modalRise 260ms var(--motion-ease) both;
+}
+
+.finding-drawer-head,
+.finding-drawer-actions{
+  position:relative;
+  z-index:1;
+  flex:0 0 auto;
+}
+
+.finding-drawer-head{border-radius:22px 22px 0 0}
+.finding-drawer-body{flex:1 1 auto;overscroll-behavior:contain}
+.finding-drawer-actions{border-radius:0 0 22px 22px}
+
+:root[data-theme="dark"] .finding-drawer{border-color:#3a4651}
+
+@media(max-width:760px){
+  .finding-drawer-backdrop{align-items:end;padding:12px 12px max(12px,env(safe-area-inset-bottom))}
+  .finding-drawer{width:100%;height:min(92dvh,calc(100dvh - 12px));max-height:calc(100dvh - 12px);border-radius:22px 22px 18px 18px}
+  .finding-drawer-head{border-radius:22px 22px 0 0}
+  .finding-drawer-actions{border-radius:0 0 18px 18px}
+  .finding-drawer-actions button:last-child{grid-column:1/-1}
+}

@@ -303,6 +303,7 @@ const nav=[
   ['findings','Befundungen','findings','Prüfungen-Business'],
   ['measures','Maßnahmen','measures','Prüfungen-Business'],
   ['reports','Berichte','reports','Prüfungen-Business'],
+  ['billing','Abrechnung','billing','Verwaltung'],
   ['intelligence','Wissen','knowledge','Wissen'],
   ['knowledge','Wiki','wiki','Wissen'],
   ['profiles','Profile','profiles','Administration'],
@@ -902,7 +903,7 @@ const rolePermissionDefinitions=[
   {id:'manageUsers',label:'Mitglieder verwalten',description:'Profile anlegen, bearbeiten und löschen.'},
   {id:'manageRoles',label:'Rollen und Rechte verwalten',description:'Rollen erstellen, Berechtigungen festlegen und zuweisen.'}
 ];
-const accessPagePermission={orders:'objects',calendar:'calendar',chats:'chats',master:'objects',inspection:'inspection',findings:'findings',measures:'measures',reports:'reports',documents:'documents',customer:'customer',testprofiles:'testProfiles',intelligence:'reports',knowledge:'documents'};
+const accessPagePermission={orders:'objects',calendar:'calendar',chats:'chats',master:'objects',inspection:'inspection',findings:'findings',measures:'measures',reports:'reports',billing:'reports',documents:'documents',customer:'customer',testprofiles:'testProfiles',intelligence:'reports',knowledge:'documents'};
 const employeeOperationalPermissions=['calendar','chats','objects','inspection','findings','measures','reports','documents','customer'];
 function rolePermissionDefaults(roleId){
   const permissions=Object.fromEntries(rolePermissionDefinitions.map(definition=>[definition.id,false]));
@@ -4331,6 +4332,7 @@ function navIconMarkup(pageId,icon){
     findings:'<path d="M12 4 3 20h18L12 4Zm0 5v5m0 3h.01"/>',
     measures:'<path d="M6 21V4m0 1h11l-2 4 2 4H6"/>',
     reports:'<path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/>',
+    billing:'<path d="M5 3.5h14v17L16.5 19 14 20.5 11.5 19 9 20.5 5 18zM8 8h8M8 12h6M8 16h4"/>',
     knowledge:'<path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H11v15H7.5A3.5 3.5 0 0 0 4 20.5v-15ZM20 5.5A3.5 3.5 0 0 0 16.5 4H13v15h3.5a3.5 3.5 0 0 1 3.5 1.5v-15Z"/>',
     wiki:'<path d="M5 4h10l4 4v12H5zM15 4v5h4M8 13h8M8 17h6"/>',
     profiles:'<circle cx="12" cy="8" r="3.25"/><path d="M5 21a7 7 0 0 1 14 0"/>',
@@ -4540,7 +4542,7 @@ function renderAll(){
   }
   navHtml();
   renderUserControl();
-  const workspacePages=(typeof orders==='function'?orders():'')+(typeof intelligence==='function'?intelligence():'')+(typeof knowledge==='function'?knowledge():'');
+  const workspacePages=(typeof orders==='function'?orders():'')+(typeof intelligence==='function'?intelligence():'')+(typeof knowledge==='function'?knowledge():'')+(typeof billing==='function'?billing():'');
   document.getElementById('pages').innerHTML=dashboard()+workspacePages+calendarPage()+chatsPage()+master()+inspection()+findings()+measures()+reports()+documents()+customer()+userProfilesPage()+testProfilesPage()+settings();
   renderDashboardCalendarPreview();
   renderDashboardGreeting();
@@ -7577,6 +7579,12 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
     return Number.isFinite(Number(value))?Number(value):null;
   }
 
+  function safetyScoreChevronMarkup(grade){
+    const levels=['A','B','C','D','E'];
+    const label='SafetyScore-Klassen A bis E. Aktuelle Klasse '+grade+'.';
+    return '<div class="safety-score-chevrons" role="img" aria-label="'+esc(label)+'">'+levels.map(level=>'<span class="safety-score-chevron grade-'+level.toLowerCase()+(level===grade?' is-active':'')+'" aria-hidden="true">'+level+'</span>').join('')+'</div>';
+  }
+
   function safetyScoreMarkup(scope){
     const score=ensureSafetyScore();
     const order=activeOrder();
@@ -7589,7 +7597,7 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
     const trend=previous==null?'Noch keine freigegebene Vergleichsbewertung':score.riskPoints===previous?'Unverändert zur letzten Freigabe':score.riskPoints<previous?'Verbessert um '+(previous-score.riskPoints)+' Risikopunkte':'Erhöht um '+(score.riskPoints-previous)+' Risikopunkte';
     const best=score.riskPoints===0?' · Bestwert':'';
     const factors=score.factors.length?score.factors.map(factor=>'<li>'+esc(factor.label)+' <b>+'+factor.points+'</b></li>').join(''):'<li>Keine risikorelevanten Einflussfaktoren</li>';
-    return '<section class="safety-score-card" aria-label="SafetyScore für '+esc(scope||'den aktiven Auftrag')+'"><div><span class="eyebrow">SafetyScore® · '+esc(scope||'Aktiver Auftrag')+'</span><h3>Klasse '+esc(score.grade)+'</h3><strong class="safety-score-value">'+score.riskPoints+' Risikopunkte'+best+'</strong><p>'+esc(context)+' · Bewertet '+esc(dateLabel(score.calculatedAt))+'</p></div><div class="safety-score-meta"><small>Regelwerk '+esc(score.ruleVersion)+'</small><small>'+esc(trend)+'</small><ul>'+factors+'</ul></div></section>';
+    return '<section class="safety-score-card" aria-label="SafetyScore für '+esc(scope||'den aktiven Auftrag')+'"><div><span class="eyebrow">SafetyScore® · '+esc(scope||'Aktiver Auftrag')+'</span><h3>Klasse '+esc(score.grade)+'</h3>'+safetyScoreChevronMarkup(score.grade)+'<strong class="safety-score-value">'+score.riskPoints+' Risikopunkte'+best+'</strong><p>'+esc(context)+' · Bewertet '+esc(dateLabel(score.calculatedAt))+'</p></div><div class="safety-score-meta"><small>Regelwerk '+esc(score.ruleVersion)+'</small><small>'+esc(trend)+'</small><ul>'+factors+'</ul></div></section>';
   }
 
   function completionReadiness(){
@@ -8168,8 +8176,8 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
       {name:'Keine sichtbare verbotene Auftragsbezeichnung',passed:!/(Prüfauftrag|Pruefauftrag)/i.test(textNodes)},
       {name:'Dashboard zeigt SafetyScore höchstens einmal im passenden Arbeitsmodus',passed:(()=>{const cards=document.querySelectorAll('#dashboard .safety-score-card,#dashboard .daily-mode-card.mode-darkblue');return cards.length<=1&&(cards.length===1||Boolean(document.querySelector('#dashboard.daily-workspace .daily-active')));})()},
       {name:'Navigation enthält Chats und Profile',passed:nav.some(item=>item[0]==='chats'&&item[1]==='Chats')&&nav.some(item=>item[0]==='profiles'&&item[1]==='Profile')},
-      {name:'Navigation folgt der vereinbarten Bereichsstruktur',passed:JSON.stringify(nav.map(item=>[item[1],item[3]]))===JSON.stringify([['Übersicht','Verwaltung'],['Aufträge','Verwaltung'],['Termine','Verwaltung'],['Chats','Verwaltung'],['Kunden / Objekte','Prüfungen-Business'],['Prüfungen','Prüfungen-Business'],['Befundungen','Prüfungen-Business'],['Maßnahmen','Prüfungen-Business'],['Berichte','Prüfungen-Business'],['Wissen','Wissen'],['Wiki','Wissen'],['Profile','Administration'],['Einstellungen','Administration']])},
-      {name:'Eingeklappte Navigation enthält Symbole für alle Einträge',passed:document.querySelectorAll('#nav button .nav-symbol svg').length===nav.length},
+      {name:'Navigation folgt der vereinbarten Bereichsstruktur',passed:JSON.stringify(nav.map(item=>[item[1],item[3]]))===JSON.stringify([['Übersicht','Verwaltung'],['Aufträge','Verwaltung'],['Termine','Verwaltung'],['Chats','Verwaltung'],['Kunden / Objekte','Prüfungen-Business'],['Prüfungen','Prüfungen-Business'],['Befundungen','Prüfungen-Business'],['Maßnahmen','Prüfungen-Business'],['Berichte','Prüfungen-Business'],['Abrechnung','Verwaltung'],['Wissen','Wissen'],['Wiki','Wissen'],['Profile','Administration'],['Einstellungen','Administration']])},
+      {name:'Eingeklappte Navigation enthält Symbole für alle Einträge',passed:(()=>{const rendered=document.querySelectorAll('#nav button .nav-symbol svg').length,appNavigation=window.INGTECAppShell?.visibleNavigation?.();return rendered===(Array.isArray(appNavigation)?appNavigation.length:nav.length);})()},
       {name:'Die Übersichtsseite ist außerhalb von Übersicht ausgeblendet',passed:(()=>{const probe=document.createElement('section');probe.id='dashboard';probe.className='page dashboard-workspace';document.getElementById('pages')?.appendChild(probe);const hidden=getComputedStyle(probe).display==='none';probe.remove();return hidden;})()}
     ];
     return {passed:tests.every(test=>test.passed),tests};
@@ -8300,6 +8308,16 @@ button.primary,button.secondary,.toolbar button,.quick-action-grid button,.row-a
 @media(max-width:1100px){.nav-group-label{display:none}.nav-group{margin:0}.app>aside #nav button>.nav-symbol{display:inline-grid!important;flex:0 0 24px;width:24px;height:24px}.app>aside #nav button>.nav-symbol svg{width:21px;height:21px}.app>aside #nav button.active>.nav-symbol{color:var(--ing)}.workspace-page-heading{min-width:0}.workspace-scope{display:none}.header-environment{display:none}.workspace-dashboard-grid{grid-template-columns:1fr}.dashboard-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.nav-group{display:contents}.workspace-page-heading{min-width:0}.workspace-breadcrumb{max-width:210px}.workspace-mobile-search{display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;min-height:44px;padding:8px;font-size:21px}.workspace-search{display:none}.workspace-search.is-mobile-open{position:fixed;z-index:1001;top:10px;right:10px;left:10px;display:flex;min-width:0;min-height:54px;margin:0;padding:12px 15px;border-color:#91ad31;background:var(--white);box-shadow:0 18px 44px rgba(16,24,40,.25)}.workspace-search.is-mobile-open input{min-width:0;font-size:16px}.workspace-notifications{display:inline-flex}.dashboard-workspace{gap:14px}.workspace-dashboard-head{gap:10px}.active-order-card{padding:16px}.active-order-title,.active-order-footer{align-items:stretch;flex-direction:column}.active-order-grid,.dashboard-kpis,.quick-action-grid,.order-grid{grid-template-columns:1fr}.safety-score-card{grid-template-columns:1fr;padding:16px}.order-process-strip{align-items:flex-start;gap:7px;padding:11px;font-size:11px}.order-card{min-height:0}.workspace-account-menu{right:12px!important;left:12px;top:74px!important;min-width:0}.header-environment{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+<style id="safety-score-chevron-restore">
+/* Historische SafetyScore-Skala: Die aktuelle Klasse wird in der A–E-Chevron-Reihe hervorgehoben. */
+.safety-score-chevrons{display:flex;align-items:center;min-height:54px;margin:10px 0 9px;padding:4px 0;isolation:isolate}
+.safety-score-chevron{position:relative;display:grid;place-items:center;width:56px;height:43px;margin-left:-11px;clip-path:polygon(0 0,72% 0,100% 50%,72% 100%,0 100%,29% 50%);color:#fff;font-size:12px;font-weight:900;letter-spacing:.03em;line-height:1;transform-origin:50% 50%;transition:transform .2s ease,filter .2s ease}
+.safety-score-chevron:first-child{margin-left:0}
+.safety-score-chevron.grade-a{background:#00a651}.safety-score-chevron.grade-b{background:#78d71d}.safety-score-chevron.grade-c{background:#ffe45c;color:#755d00}.safety-score-chevron.grade-d{background:#f7b500;color:#6d4800}.safety-score-chevron.grade-e{background:#f04400}
+.safety-score-chevron.is-active{z-index:2;transform:scale(1.28);filter:drop-shadow(0 6px 6px rgba(16,24,40,.24))}
+:root[data-theme="dark"] .safety-score-chevron.is-active{filter:drop-shadow(0 6px 8px rgba(0,0,0,.48))}
+@media(max-width:760px){.safety-score-chevrons{min-height:49px;margin:8px 0}.safety-score-chevron{width:50px;height:39px;margin-left:-10px;font-size:11px}.safety-score-chevron.is-active{transform:scale(1.23)}}
 </style>
 <style id="ingtec-dropdown-polish-styles">
 /* Einheitliche Auswahlfelder: native Einzel- und Mehrfachauswahl sowie die
@@ -8498,15 +8516,18 @@ window.renderAll();
 <script src="INGTEC_Assets/collaboration-suite.js?v=20260816-chat-icons-v4"></script>
 <script src="INGTEC_Assets/inspection-workspace.js?v=20260816-inspection-v10"></script>
 <link rel="stylesheet" href="INGTEC_Assets/finding-workspace.css?v=20260807-findings-v3">
-<script src="INGTEC_Assets/finding-workspace.js?v=20260810-findings-v4"></script>
+<link rel="stylesheet" href="INGTEC_Assets/finding-modal.css?v=20260824-finding-modal-v2">
+<script src="INGTEC_Assets/finding-workspace.js?v=20260824-findings-v5"></script>
 <link rel="stylesheet" href="INGTEC_Assets/measure-workspace.css?v=20260807-measures-v4">
 <script src="INGTEC_Assets/measure-workspace.js?v=20260810-measures-v5"></script>
+<link rel="stylesheet" href="INGTEC_Assets/billing-workspace.css?v=20260824-billing-v4">
+<script src="INGTEC_Assets/billing-workspace.js?v=20260824-billing-v4"></script>
 <link rel="stylesheet" href="INGTEC_Assets/daily-workspace.css?v=20260810-daily-v2">
 <script src="INGTEC_Assets/daily-workspace.js?v=20260807-daily-v1"></script>
   <link rel="stylesheet" href="INGTEC_Assets/app-platform.css?v=20260810-platform-v2">
-  <script src="INGTEC_Assets/app-platform.js?v=20260810-platform-v3"></script>
+  <script src="INGTEC_Assets/app-platform.js?v=20260824-platform-v4"></script>
   <link rel="stylesheet" href="INGTEC_Assets/app-shell.css?v=20260817-app-shell-v2">
-  <script src="INGTEC_Assets/app-registry.js?v=20260817-app-registry-v1"></script>
+  <script src="INGTEC_Assets/app-registry.js?v=20260824-app-registry-v2"></script>
   <script src="INGTEC_Assets/app-shell.js?v=20260817-app-shell-v2"></script>
   <link rel="stylesheet" href="INGTEC_Assets/hub-launcher.css?v=20260817-individual-apps-v2">
 <style id="hub-drag-visual-fix">

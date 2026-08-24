@@ -1,4 +1,4 @@
-const CACHE_VERSION='ingtec-inspect-v2.5.30';
+const CACHE_VERSION='ingtec-inspect-v2.5.38';
 const APP_SHELL=[
   './',
   './index.html',
@@ -17,11 +17,14 @@ const APP_SHELL=[
   './INGTEC_Assets/daily-workspace.css',
   './INGTEC_Assets/daily-workspace.js',
   './INGTEC_Assets/finding-workspace.css',
+  './INGTEC_Assets/finding-modal.css',
   './INGTEC_Assets/finding-workspace.js',
   './INGTEC_Assets/inspection-workspace.css',
   './INGTEC_Assets/inspection-workspace.js',
   './INGTEC_Assets/measure-workspace.css',
   './INGTEC_Assets/measure-workspace.js',
+  './INGTEC_Assets/billing-workspace.css',
+  './INGTEC_Assets/billing-workspace.js',
   './INGTEC_Assets/report-pdf.js',
   './INGTEC_Assets/ingtec-logo-light.svg',
   './INGTEC_Assets/ingtec-logo-dark.svg'
