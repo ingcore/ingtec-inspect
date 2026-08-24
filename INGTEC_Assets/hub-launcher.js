@@ -141,6 +141,7 @@
       contacts:'<circle cx="9" cy="9" r="3"/><path d="M3.8 20c.7-3.1 2.5-4.7 5.2-4.7s4.5 1.6 5.2 4.7M16 8h5M18.5 5.5v5"/>',
       offers:'<path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h5M8 16h4"/>',
       billing:'<path d="M5 3.5h14v17L16.5 19 14 20.5 11.5 19 9 20.5 5 18z"/><path d="M8 8h8M8 12h6M8 16h4"/>',
+      compliance:'<path d="M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21.5H8A1.5 1.5 0 0 1 6.5 20V5A1.5 1.5 0 0 1 8 3.5Z"/><path d="M9.5 3.5h5v2h-5z"/><path d="m8.5 12.5 2 2 4-4.5M8.5 17h6"/>',
       academy:'<path d="m3 9 9-4 9 4-9 4z"/><path d="M6 11.5V16c2.5 2.5 9.5 2.5 12 0v-4.5M21 10v5"/>'
     };
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(icons[kind]||icons.dashboard)+'</svg>';

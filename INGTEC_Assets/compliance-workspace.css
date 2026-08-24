@@ -1,0 +1,268 @@
+/* INGTEC Prüfpflichten (Asset Compliance) – MVP-Prototyp */
+#compliance *{min-width:0}
+/* !important: setPage() lässt beim Seitenübergang ein inline style="display:block"
+   auf der Zielseite zurück (siehe setPage() in index.html) und räumt es nie auf.
+   Ohne !important würde das die Grid-Darstellung dauerhaft überschreiben. */
+#compliance.compliance-workspace.active{display:grid!important;gap:20px;max-width:1480px}
+#compliance .compliance-page-head{margin-bottom:0}
+#compliance .compliance-page-head .eyebrow{color:#5c7808}
+.compliance-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0;color:#667085;font-size:11px;font-weight:750}
+.compliance-breadcrumb button{padding:2px 0;border:0;background:none;color:#4d6f0b;font:inherit;font-weight:800;cursor:pointer}
+.compliance-breadcrumb button:hover{text-decoration:underline}
+.compliance-breadcrumb span{color:#17202a;font-weight:850}
+.compliance-breadcrumb i{color:#98a2b3;font-style:normal}
+.compliance-quicknav{display:flex;gap:6px;padding:4px;border:1px solid #e3e8ec;border-radius:12px;background:#f5f7f8;width:fit-content(100%);max-width:100%;overflow-x:auto}
+.compliance-quicknav button{min-height:36px;padding:6px 14px;border:0;border-radius:9px;background:transparent;color:#475467;font-size:11px;font-weight:800;cursor:pointer}
+.compliance-quicknav button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
+
+/* KPI + index */
+.compliance-summary-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.compliance-kpi{display:grid;gap:4px;min-height:104px;padding:16px;border-top:3px solid #9dc31a}
+.compliance-kpi small{color:#667085;font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+.compliance-kpi strong{color:#17202a;font-size:26px;line-height:1.08;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.compliance-kpi span{color:#667085;font-size:11px}
+.compliance-kpi.is-alert{border-top-color:#e05a47;background:#fffafa}
+.compliance-kpi.is-alert strong{color:#b42318}
+.compliance-index-card{display:grid;gap:10px;padding:20px}
+.compliance-index-card h3{margin:0;color:#17202a;font-size:15px}
+.compliance-index-value{color:#3d5500;font-size:38px;font-weight:900;letter-spacing:-.04em}
+.compliance-metric-row{display:grid;grid-template-columns:170px 1fr 46px;align-items:center;gap:10px;font-size:11px;color:#475467}
+.compliance-metric-track{height:8px;border-radius:99px;background:#eef1f4;overflow:hidden}
+.compliance-metric-track span{display:block;height:100%;border-radius:99px;background:#9dc31a}
+.compliance-metric-row b{text-align:right;color:#17202a;font-variant-numeric:tabular-nums}
+.compliance-critical-card ul{display:grid;gap:8px;margin:10px 0 0;padding-left:18px;color:#344054;font-size:12px}
+.compliance-empty-inline{padding:16px;border:1px dashed #cbd5dc;border-radius:10px;color:#667085;text-align:center;font-size:12px}
+
+/* Section head */
+.compliance-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:12px}
+.compliance-section-head h3{margin:2px 0 0;color:#17202a;font-size:16px}
+.compliance-section-head p{margin:2px 0 0;color:#667085;font-size:11px}
+
+/* Site & category grids */
+.compliance-site-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.compliance-site-card{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;transition:box-shadow .15s ease,transform .15s ease}
+.compliance-site-card:hover{box-shadow:0 10px 26px rgba(16,24,40,.12);transform:translateY(-1px)}
+.compliance-site-card h3{margin:2px 0 0;font-size:16px}
+.compliance-site-stats{display:grid;justify-items:end;gap:2px}
+.compliance-site-stats strong{color:#17202a;font-size:22px}
+.compliance-site-stats span{color:#667085;font-size:10px}
+.compliance-category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.compliance-category-card{position:relative;padding-left:20px;cursor:pointer;transition:box-shadow .15s ease}
+.compliance-category-card::before{content:"";position:absolute;top:14px;bottom:14px;left:0;width:4px;border-radius:4px;background:#98a2b3}
+.compliance-category-card.tone-overdue::before{background:#f04438}
+.compliance-category-card.tone-unknown::before{background:#98a2b3;background-image:repeating-linear-gradient(45deg,#98a2b3 0 4px,#e4e7ec 4px 8px)}
+.compliance-category-card.tone-due::before,.compliance-category-card.tone-due-soon::before{background:#f7b500}
+.compliance-category-card.tone-valid::before{background:#00a651}
+.compliance-category-card:hover{box-shadow:0 8px 22px rgba(16,24,40,.1)}
+.compliance-category-card h3{margin:0;font-size:14px}
+.compliance-category-card>div>span{color:#667085;font-size:11px}
+.compliance-category-card ul{display:grid;gap:5px;margin:12px 0 0;padding:0;list-style:none;font-size:11px}
+.compliance-category-card li{color:#475467}
+.compliance-category-card li.is-overdue{color:#b42318}
+.compliance-category-card li.is-due{color:#8a6100}
+.compliance-category-card li.is-unknown{color:#667085}
+.compliance-category-card li.is-valid{color:#087443}
+
+/* Status badge */
+.compliance-status{display:inline-flex;align-items:center;gap:5px;min-height:24px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:850;white-space:nowrap}
+.compliance-status b{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;background:rgba(0,0,0,.14);font-size:9px}
+.compliance-status.size-sm{min-height:21px;padding:2px 8px;font-size:9px}
+.compliance-status.tone-valid{background:#e8f7ee;color:#087443}
+.compliance-status.tone-due-soon{background:#fff4cc;color:#8a6100}
+.compliance-status.tone-due{background:#ffe6cc;color:#9a4b00}
+.compliance-status.tone-overdue{background:#fee4e2;color:#b42318}
+.compliance-status.tone-scheduled{background:#e8f1ff;color:#285d9e}
+.compliance-status.tone-unknown{background:#eef1f4;color:#475467;border:1px dashed #98a2b3}
+.compliance-status.tone-muted{background:#f2f4f7;color:#667085}
+.compliance-status.is-critical{background:#b42318;color:#fff}
+.compliance-status.is-critical b{background:rgba(255,255,255,.28)}
+.compliance-type-tag{display:inline-flex;align-items:center;min-height:20px;padding:2px 7px;border-radius:7px;background:#eef1f4;color:#475467;font-size:9px;font-weight:900;letter-spacing:.03em}
+.compliance-type-tag.is-maintenance{background:#e8f1ff;color:#285d9e}
+.compliance-type-tag.is-inspection{background:#f0f6e0;color:#4d6608}
+
+/* Asset grid & cards */
+.compliance-asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.compliance-asset-card{position:relative;display:grid;gap:8px;padding-left:18px;border-top:0}
+.compliance-asset-card::before{content:"";position:absolute;top:0;bottom:0;left:0;width:4px;border-radius:14px 0 0 14px;background:#98a2b3}
+.compliance-asset-card.tone-valid::before{background:#00a651}
+.compliance-asset-card.tone-due-soon::before{background:#ffd633}
+.compliance-asset-card.tone-due::before{background:#f7b500}
+.compliance-asset-card.tone-overdue::before{background:#f04438}
+.compliance-asset-card.tone-scheduled::before{background:#4d90e0}
+.compliance-asset-card.tone-unknown::before{background:#98a2b3}
+.compliance-asset-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.compliance-asset-card-head b{color:#17202a;font-size:13px}
+.compliance-asset-card h3{margin:0;color:#17202a;font-size:14px;line-height:1.3}
+.compliance-asset-card p{margin:0;color:#667085;font-size:11px}
+.compliance-asset-card-model{color:#98a2b3!important}
+.compliance-asset-card-due{display:flex;align-items:baseline;gap:8px;padding:8px 10px;border-radius:9px;background:#f8fafb}
+.compliance-asset-card-due small{color:#667085;font-size:9px;text-transform:uppercase}
+.compliance-asset-card-due b{color:#17202a;font-size:13px}
+.compliance-asset-card-due span{margin-left:auto;color:#667085;font-size:10px}
+.compliance-asset-card-stats{display:flex;flex-wrap:wrap;gap:10px;color:#667085;font-size:10px}
+.compliance-asset-card-stats b{color:#17202a}
+.compliance-asset-card-actions{display:flex;justify-content:flex-end}
+.compliance-asset-card-actions .secondary{min-height:34px;padding:6px 12px;font-size:10px}
+
+/* View toggle & table */
+.compliance-view-toggle{display:flex;gap:4px;padding:3px;border:1px solid #e3e8ec;border-radius:10px;background:#f5f7f8}
+.compliance-view-toggle button{min-height:32px;padding:5px 12px;border:0;border-radius:7px;background:transparent;color:#475467;font-size:10px;font-weight:800;cursor:pointer}
+.compliance-view-toggle button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
+.compliance-table-wrap{padding:0;overflow:auto}
+.compliance-table{width:100%;min-width:820px;border-collapse:collapse}
+.compliance-table th{padding:11px 14px;border-bottom:1px solid #e7ebee;background:#f8fafb;color:#667085;font-size:10px;font-weight:900;letter-spacing:.04em;text-align:left;text-transform:uppercase;white-space:nowrap}
+.compliance-table td{padding:12px 14px;border-bottom:1px solid #eef1f3;color:#344054;font-size:12px;vertical-align:middle}
+.compliance-table b{display:block;color:#17202a;font-size:12px}
+.compliance-table small{display:block;margin-top:2px;color:#788491;font-size:10px}
+
+/* Asset detail */
+.compliance-asset-detail{display:grid;gap:16px}
+.compliance-asset-header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:18px 20px;border:1px solid #e3e8ec;border-radius:16px;background:#fff}
+.compliance-asset-header h2{margin:2px 0;font-size:22px}
+.compliance-asset-header p{margin:0;color:#667085;font-size:12px}
+.compliance-asset-location{margin-left:auto;color:#475467;font-size:11px;font-weight:750}
+.compliance-asset-actions{display:flex;flex-wrap:wrap;gap:8px}
+.compliance-asset-actions button{min-height:40px}
+.compliance-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:3px;border:1px solid #e3e8ec;border-radius:11px;background:#f5f7f8;width:fit-content(100%);max-width:100%;overflow-x:auto}
+.compliance-tabs button{min-height:34px;padding:6px 12px;border:0;border-radius:8px;background:transparent;color:#475467;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}
+.compliance-tabs button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
+.compliance-tab-panel{display:grid;gap:14px}
+.compliance-overview-grid{grid-template-columns:1fr 1fr}
+.compliance-overview-grid .card{padding:18px}
+.compliance-overview-grid h3{margin:4px 0;font-size:20px}
+.compliance-overview-grid .link{margin-top:6px;padding:0;font-size:11px}
+.compliance-meta-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #f0f2f4;font-size:11px}
+.compliance-meta-line:last-child{border-bottom:0}
+.compliance-meta-line span{color:#667085}
+.compliance-meta-line b{color:#17202a;text-align:right}
+
+/* Obligation cards + list */
+.compliance-obligation-list{grid-template-columns:1fr;gap:10px}
+.compliance-obligation-card{cursor:pointer;transition:box-shadow .15s ease}
+.compliance-obligation-card:hover{box-shadow:0 8px 22px rgba(16,24,40,.1)}
+.compliance-obligation-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.compliance-obligation-head h4{margin:0;flex:1;min-width:120px;color:#17202a;font-size:13px}
+.compliance-obligation-card p{margin:6px 0 0;color:#475467;font-size:11px}
+.compliance-obligation-source{color:#98a2b3!important;font-size:10px!important}
+
+/* Mängel */
+.compliance-defect-card{display:grid;gap:6px}
+.compliance-defect-head{display:flex;align-items:center;justify-content:space-between}
+.compliance-defect-head b{color:#17202a;font-size:12px}
+.compliance-risk{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:850}
+.compliance-risk.tone-hoch{background:#fee4e2;color:#b42318}
+.compliance-risk.tone-mittel{background:#fff4cc;color:#8a6100}
+.compliance-risk.tone-niedrig{background:#eef1f4;color:#475467}
+.compliance-defect-card h4{margin:0;font-size:13px}
+
+/* Dokumente */
+.compliance-tab-hint{margin:0;color:#98a2b3;font-size:10px}
+.compliance-doc-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.compliance-doc-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid #eef1f3;border-radius:9px;background:#fff;font-size:11px;color:#344054}
+.compliance-doc-list small{color:#98a2b3;font-size:9px;text-transform:uppercase}
+
+/* Historie */
+.compliance-history{display:grid;gap:0}
+.compliance-history-row{display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f4;font-size:11px}
+.compliance-history-row:last-child{border-bottom:0}
+.compliance-history-row b{color:#17202a}
+.compliance-history-row span{display:block;color:#344054}
+.compliance-history-row small{display:block;margin-top:2px;color:#98a2b3}
+
+/* Datenqualität */
+.compliance-quality-line{padding:5px 0;font-size:11px}
+.compliance-quality-line.is-ok{color:#087443}
+.compliance-quality-line.is-missing{color:#b42318}
+
+/* Fälligkeitsübersicht */
+.compliance-chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.compliance-chip{min-height:34px;padding:6px 14px;border:1px solid #d6dce3;border-radius:999px;background:#fff;color:#475467;font-size:11px;font-weight:800;cursor:pointer}
+.compliance-chip.active{border-color:#9dc31a;background:#f0f6e0;color:#4d6608}
+.compliance-group-title{display:flex;align-items:center;gap:8px;margin:6px 0 10px;color:#17202a;font-size:13px}
+.compliance-group-title span{padding:2px 8px;border-radius:999px;background:#eef1f4;color:#667085;font-size:10px;font-weight:850}
+.compliance-due-list{display:grid;gap:10px}
+.compliance-due-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px}
+.compliance-due-row>div:first-child{display:flex;align-items:center;gap:8px;min-width:0}
+.compliance-due-row>div:first-child b{color:#17202a;font-size:12px;white-space:nowrap}
+.compliance-due-row>div:first-child span{overflow:hidden;color:#667085;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.compliance-due-line{display:grid;gap:2px;text-align:right}
+.compliance-due-line small{color:#667085;font-size:10px}
+.compliance-due-row .secondary{min-height:34px;padding:6px 14px;font-size:10px}
+
+/* Obligation panel (zentriertes Modal, folgt dem .finding-drawer-Muster) */
+.compliance-panel *{min-width:0}
+.compliance-panel{display:flex;width:min(600px,calc(100vw - 40px));height:min(720px,calc(100dvh - 40px));max-height:calc(100dvh - 40px);flex-direction:column;overflow:hidden;border:1px solid rgba(255,255,255,.8);border-radius:22px;background:#f5f7f8;color:var(--ink);box-shadow:0 28px 70px rgba(16,24,40,.28);animation:modalRise 260ms var(--motion-ease) both}
+.compliance-panel-head{position:relative;z-index:1;flex:0 0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:17px 20px;border-bottom:1px solid #e3e8ec;border-radius:22px 22px 0 0;background:rgba(255,255,255,.96)}
+.compliance-panel-head h2{margin:3px 0;font-size:19px}
+.compliance-panel-body{flex:1 1 auto;display:grid;align-content:start;gap:2px;min-height:0;padding:14px 20px;overflow-y:auto;overscroll-behavior:contain}
+.compliance-derive-details{margin-top:14px;padding:12px;border:1px solid #e3e8ec;border-radius:12px;background:#fff}
+.compliance-derive-details summary{color:#4d6608;font-size:11px;font-weight:850;cursor:pointer}
+.compliance-derive-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 0}
+.compliance-derive-grid dt{color:#667085;font-size:9px;text-transform:uppercase}
+.compliance-derive-grid dd{margin:3px 0 0;color:#17202a;font-size:12px;font-weight:750}
+.compliance-panel-actions{position:relative;z-index:1;flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e3e8ec;border-radius:0 0 22px 22px;background:rgba(255,255,255,.97)}
+
+/* Prüfung erfassen (Modal) */
+.compliance-modal-card *{min-width:0}
+.compliance-modal-card{width:min(720px,100%)}
+.compliance-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.compliance-form-grid>label{display:grid;gap:6px;color:#344054;font-size:12px;font-weight:800}
+.compliance-form-grid input,.compliance-form-grid select{min-height:42px;padding:9px 11px;border:1px solid #d6dce3;border-radius:10px;background:#fff;color:#17202a;font:inherit;font-size:13px;font-weight:600}
+.compliance-form-wide{grid-column:1/-1}
+.compliance-result-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:6px}
+.compliance-result-btn{min-height:52px;padding:8px 10px;border:2px solid #d6dce3;border-radius:12px;background:#fff;color:#344054;font-size:10.5px;font-weight:850;letter-spacing:.02em;cursor:pointer}
+.compliance-result-btn.active{border-color:#9dc31a;background:#f0f6e0;color:#3d5500}
+.compliance-evidence-list{display:flex;flex-wrap:wrap;gap:6px}
+.compliance-evidence-list span{padding:4px 9px;border-radius:7px;background:#eef1f4;color:#475467;font-size:10px}
+.compliance-evidence-check{margin:14px 0;padding:12px 14px;border-left:3px solid #9dc31a;border-radius:0 10px 10px 0;background:#f6f9ec;color:#3d5500;font-size:11px;line-height:1.6}
+.compliance-evidence-check b{display:block;margin-bottom:4px;font-size:10px;letter-spacing:.04em}
+.compliance-evidence-check span{display:block;margin-top:6px;font-weight:850}
+
+/* Dark mode */
+:root[data-theme="dark"] .compliance-breadcrumb{color:#98a2b3}
+:root[data-theme="dark"] .compliance-breadcrumb span{color:#f3f6f8}
+:root[data-theme="dark"] .compliance-quicknav,:root[data-theme="dark"] .compliance-view-toggle,:root[data-theme="dark"] .compliance-tabs{border-color:#3a4651;background:#202730}
+:root[data-theme="dark"] .compliance-quicknav button.active,:root[data-theme="dark"] .compliance-view-toggle button.active,:root[data-theme="dark"] .compliance-tabs button.active{background:#2d3640;color:#f3f6f8}
+:root[data-theme="dark"] .compliance-kpi,:root[data-theme="dark"] .compliance-index-card,:root[data-theme="dark"] .compliance-critical-card,:root[data-theme="dark"] .compliance-site-card,:root[data-theme="dark"] .compliance-category-card,:root[data-theme="dark"] .compliance-asset-card,:root[data-theme="dark"] .compliance-table-wrap,:root[data-theme="dark"] .compliance-obligation-card,:root[data-theme="dark"] .compliance-defect-card,:root[data-theme="dark"] .compliance-asset-header,:root[data-theme="dark"] .compliance-panel,:root[data-theme="dark"] .compliance-panel-head,:root[data-theme="dark"] .compliance-panel-actions,:root[data-theme="dark"] .compliance-derive-details,:root[data-theme="dark"] .compliance-due-row,:root[data-theme="dark"] .compliance-overview-grid .card{border-color:#3a4651;background:#202730;color:#f3f6f8}
+:root[data-theme="dark"] .compliance-panel{background:#192027}
+:root[data-theme="dark"] .compliance-kpi strong,:root[data-theme="dark"] .compliance-index-card h3,:root[data-theme="dark"] .compliance-asset-card h3,:root[data-theme="dark"] .compliance-asset-card-due b,:root[data-theme="dark"] .compliance-table b,:root[data-theme="dark"] .compliance-meta-line b,:root[data-theme="dark"] .compliance-history-row b,:root[data-theme="dark"] .compliance-derive-grid dd,:root[data-theme="dark"] .compliance-asset-header h2{color:#f3f6f8}
+:root[data-theme="dark"] .compliance-table th{background:#1a2128;color:#aeb9c3;border-color:rgba(255,255,255,.1)}
+:root[data-theme="dark"] .compliance-table td,:root[data-theme="dark"] .compliance-meta-line,:root[data-theme="dark"] .compliance-history-row{border-color:rgba(255,255,255,.08)}
+:root[data-theme="dark"] .compliance-doc-list li{border-color:#3a4651;background:#171d23;color:#d6dee7}
+:root[data-theme="dark"] .compliance-chip{border-color:#3a4651;background:#202730;color:#d6dee7}
+:root[data-theme="dark"] .compliance-chip.active{border-color:#9dc31a;background:#2d3920;color:#d9ee98}
+:root[data-theme="dark"] .compliance-form-grid input,:root[data-theme="dark"] .compliance-form-grid select{border-color:#3a4651;background:#171d23;color:#f3f6f8}
+:root[data-theme="dark"] .compliance-result-btn{border-color:#3a4651;background:#171d23;color:#d6dee7}
+:root[data-theme="dark"] .compliance-result-btn.active{border-color:#9dc31a;background:#2d3920;color:#d9ee98}
+:root[data-theme="dark"] .compliance-evidence-check{background:#263419;color:#d9ee98}
+:root[data-theme="dark"] .compliance-status.tone-valid{background:#1f4936;color:#a7ebc2}
+:root[data-theme="dark"] .compliance-status.tone-due-soon{background:#4e4320;color:#ffe7a1}
+:root[data-theme="dark"] .compliance-status.tone-due{background:#4a3419;color:#ffc891}
+:root[data-theme="dark"] .compliance-status.tone-overdue{background:#552b28;color:#ffb4ad}
+:root[data-theme="dark"] .compliance-status.tone-scheduled{background:#1f3350;color:#bcd6ff}
+:root[data-theme="dark"] .compliance-status.tone-unknown{background:#2a333d;color:#c3ccd6;border-color:#5c6773}
+:root[data-theme="dark"] .compliance-status.tone-muted{background:#2a333d;color:#aeb9c3}
+:root[data-theme="dark"] .compliance-type-tag{background:#2a333d;color:#c3ccd6}
+:root[data-theme="dark"] .compliance-type-tag.is-maintenance{background:#1f3350;color:#bcd6ff}
+:root[data-theme="dark"] .compliance-type-tag.is-inspection{background:#2d3920;color:#d9ee98}
+
+/* Responsive */
+@media(max-width:1150px){.compliance-summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-site-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-overview-grid{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .compliance-summary-row,.compliance-site-grid{grid-template-columns:1fr}
+  .compliance-category-grid,.compliance-asset-grid{grid-template-columns:1fr}
+  .compliance-section-head{flex-direction:column;align-items:flex-start}
+  .compliance-asset-header{flex-direction:column;align-items:flex-start}
+  .compliance-asset-location{margin-left:0}
+  .compliance-asset-actions{flex-direction:column}
+  .compliance-asset-actions button{width:100%}
+  .compliance-table-wrap{overflow-x:auto}
+  .compliance-table{min-width:760px}
+  .compliance-due-row{grid-template-columns:1fr;justify-items:start}
+  .compliance-due-line{text-align:left}
+  .compliance-panel{width:100%;height:min(92dvh,calc(100dvh - 12px));max-height:calc(100dvh - 12px);border-radius:22px 22px 18px 18px}
+  .compliance-panel-head{border-radius:22px 22px 0 0}
+  .compliance-panel-actions{border-radius:0 0 18px 18px}
+  .compliance-form-grid{grid-template-columns:1fr}
+  .compliance-derive-grid{grid-template-columns:1fr}
+}

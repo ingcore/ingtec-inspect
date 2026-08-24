@@ -1,5 +1,8 @@
 /* INGTEC Abrechnung – lokale Abrechnungsvorbereitung */
-#billing.billing-workspace{display:grid;gap:24px;max-width:1480px}
+/* !important: setPage() lässt beim Seitenübergang ein inline style="display:block"
+   auf der Zielseite zurück (siehe setPage() in index.html) und räumt es nie auf.
+   Ohne !important würde das die Grid-Darstellung dauerhaft überschreiben. */
+#billing.billing-workspace.active{display:grid!important;gap:24px;max-width:1480px}
 #billing .billing-page-head{align-items:flex-start;margin-bottom:0}
 #billing .billing-page-head .eyebrow{color:#5c7808}
 #billing .billing-local-note{margin:0 0 4px;padding:12px 14px;border:1px solid rgba(95,117,0,.18);border-radius:13px;background:rgba(157,195,26,.09);color:#475467;font-size:12px;line-height:1.5}
