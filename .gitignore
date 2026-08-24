@@ -6,6 +6,8 @@ desktop.ini
 # Editors
 .vscode/*
 !.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/auto-publish.ps1
 
 # Env / secrets (this app has no server, but keep the convention)
 .env

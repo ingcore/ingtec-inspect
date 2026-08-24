@@ -53,3 +53,4 @@ Alle Asset-Pfade (`INGTEC_Assets/...`, Manifest-Icons, Service-Worker-Registrier
 ## Hinweise zu Produktionsgrenzen
 
 Siehe [ARCHITECTURE.md](./ARCHITECTURE.md) und [QA_REPORT.md](./QA_REPORT.md) für Details zu bewusst nicht produktiven Aspekten (browserseitige Rollen/Freigaben ohne serverseitige Autorisierung, kein revisionssicheres Auditlog, Odoo/SharePoint/Entra ID bewusst unkonfiguriert). `IngtecHub.jsx` ist eine UI-Referenz und wird von der statischen App nicht geladen.
+test change Mon Aug 24 10:04:48     2026
