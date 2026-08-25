@@ -1,40 +1,49 @@
 /* INGTEC Prüfpflichten (Asset Compliance) – MVP-Prototyp */
 #compliance *{min-width:0}
+/* Text-Farbstufen als Custom Properties: ein einziger Dark-Mode-Block weiter
+   unten hellt damit ausnahmslos jeden Text im Modul auf, statt dass jede neue
+   Komponente einzeln nachgezogen werden muss (das ist uns schon mehrfach
+   durchgerutscht). Gilt auch für das Prüfpflicht-Panel und den Erfassen-Dialog,
+   die als eigene Backdrops außerhalb von #compliance im body hängen. */
+#compliance,.compliance-panel,.compliance-modal-card{--c-ink:#17202a;--c-body:#344054;--c-muted:#667085;--c-secondary:#475467;--c-soft:#98a2b3}
+:root[data-theme="dark"] #compliance,:root[data-theme="dark"] .compliance-panel,:root[data-theme="dark"] .compliance-modal-card{--c-ink:#f3f6f8;--c-body:#c3ccd6;--c-muted:#b9c5d0;--c-secondary:#c3ccd6;--c-soft:#8b97a3}
 /* !important: setPage() lässt beim Seitenübergang ein inline style="display:block"
    auf der Zielseite zurück (siehe setPage() in index.html) und räumt es nie auf.
    Ohne !important würde das die Grid-Darstellung dauerhaft überschreiben. */
 #compliance.compliance-workspace.active{display:grid!important;gap:20px;max-width:1480px}
 #compliance .compliance-page-head{margin-bottom:0}
 #compliance .compliance-page-head .eyebrow{color:#5c7808}
-.compliance-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0;color:#667085;font-size:11px;font-weight:750}
+:root[data-theme="dark"] #compliance .compliance-page-head .eyebrow{color:#c3e15c}
+.compliance-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0;color:var(--c-muted);font-size:11px;font-weight:750}
 .compliance-breadcrumb button{padding:2px 0;border:0;background:none;color:#4d6f0b;font:inherit;font-weight:800;cursor:pointer}
 .compliance-breadcrumb button:hover{text-decoration:underline}
-.compliance-breadcrumb span{color:#17202a;font-weight:850}
-.compliance-breadcrumb i{color:#98a2b3;font-style:normal}
+.compliance-breadcrumb span{color:var(--c-ink);font-weight:850}
+.compliance-breadcrumb i{color:var(--c-soft);font-style:normal}
+:root[data-theme="dark"] .compliance-breadcrumb button{color:#c3e15c}
 
 /* KPI + index */
 .compliance-portfolio{display:grid;gap:18px}
 .compliance-summary-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .compliance-kpi{display:grid;gap:4px;min-height:104px;padding:16px;border-top:3px solid #9dc31a}
-.compliance-kpi small{color:#667085;font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
-.compliance-kpi strong{color:#17202a;font-size:26px;line-height:1.08;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.compliance-kpi span{color:#667085;font-size:11px}
+.compliance-kpi small{color:var(--c-muted);font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
+.compliance-kpi strong{color:var(--c-ink);font-size:26px;line-height:1.08;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.compliance-kpi span{color:var(--c-muted);font-size:11px}
 .compliance-kpi.is-alert{border-top-color:#e05a47;background:#fffafa}
 .compliance-kpi.is-alert strong{color:#b42318}
 .compliance-index-card{display:grid;gap:10px;padding:20px}
-.compliance-index-card h3{margin:0;color:#17202a;font-size:15px}
+.compliance-index-card h3{margin:0;color:var(--c-ink);font-size:15px}
 .compliance-index-value{color:#3d5500;font-size:38px;font-weight:900;letter-spacing:-.04em}
-.compliance-metric-row{display:grid;grid-template-columns:170px 1fr 46px;align-items:center;gap:10px;font-size:11px;color:#475467}
+.compliance-metric-row{display:grid;grid-template-columns:170px 1fr 46px;align-items:center;gap:10px;font-size:11px;color:var(--c-secondary)}
 .compliance-metric-track{height:8px;border-radius:99px;background:#eef1f4;overflow:hidden}
 .compliance-metric-track span{display:block;height:100%;border-radius:99px;background:#9dc31a}
-.compliance-metric-row b{text-align:right;color:#17202a;font-variant-numeric:tabular-nums}
-.compliance-critical-card ul{display:grid;gap:8px;margin:10px 0 0;padding-left:18px;color:#344054;font-size:12px}
-.compliance-empty-inline{padding:16px;border:1px dashed #cbd5dc;border-radius:10px;color:#667085;text-align:center;font-size:12px}
+.compliance-metric-row b{text-align:right;color:var(--c-ink);font-variant-numeric:tabular-nums}
+.compliance-critical-card ul{display:grid;gap:8px;margin:10px 0 0;padding-left:18px;color:var(--c-body);font-size:12px}
+.compliance-empty-inline{padding:16px;border:1px dashed #cbd5dc;border-radius:10px;color:var(--c-muted);text-align:center;font-size:12px}
 
 /* Section head */
 .compliance-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:12px}
-.compliance-section-head h3{margin:2px 0 0;color:#17202a;font-size:16px}
-.compliance-section-head p{margin:2px 0 0;color:#667085;font-size:11px}
+.compliance-section-head h3{margin:2px 0 0;color:var(--c-ink);font-size:16px}
+.compliance-section-head p{margin:2px 0 0;color:var(--c-muted);font-size:11px}
 
 /* Site & category grids */
 .compliance-site-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -42,8 +51,8 @@
 .compliance-site-card:hover{box-shadow:0 10px 26px rgba(16,24,40,.12);transform:translateY(-1px)}
 .compliance-site-card h3{margin:2px 0 0;font-size:16px}
 .compliance-site-stats{display:grid;justify-items:end;gap:2px}
-.compliance-site-stats strong{color:#17202a;font-size:22px}
-.compliance-site-stats span{color:#667085;font-size:10px}
+.compliance-site-stats strong{color:var(--c-ink);font-size:22px}
+.compliance-site-stats span{color:var(--c-muted);font-size:10px}
 .compliance-category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .compliance-category-card{position:relative;padding-left:20px;cursor:pointer;transition:box-shadow .15s ease}
 .compliance-category-card::before{content:"";position:absolute;top:14px;bottom:14px;left:0;width:4px;border-radius:4px;background:#98a2b3}
@@ -53,12 +62,12 @@
 .compliance-category-card.tone-valid::before{background:#00a651}
 .compliance-category-card:hover{box-shadow:0 8px 22px rgba(16,24,40,.1)}
 .compliance-category-card h3{margin:0;font-size:14px}
-.compliance-category-card>div>span{color:#667085;font-size:11px}
+.compliance-category-card>div>span{color:var(--c-muted);font-size:11px}
 .compliance-category-card ul{display:grid;gap:5px;margin:12px 0 0;padding:0;list-style:none;font-size:11px}
-.compliance-category-card li{color:#475467}
+.compliance-category-card li{color:var(--c-secondary)}
 .compliance-category-card li.is-overdue{color:#b42318}
 .compliance-category-card li.is-due{color:#8a6100}
-.compliance-category-card li.is-unknown{color:#667085}
+.compliance-category-card li.is-unknown{color:var(--c-muted)}
 .compliance-category-card li.is-valid{color:#087443}
 
 /* Status badge */
@@ -89,41 +98,41 @@
 .compliance-asset-card.tone-scheduled::before{background:#4d90e0}
 .compliance-asset-card.tone-unknown::before{background:#98a2b3}
 .compliance-asset-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.compliance-asset-card-head b{color:#17202a;font-size:13px}
-.compliance-asset-card h3{margin:0;color:#17202a;font-size:14px;line-height:1.3}
-.compliance-asset-card p{margin:0;color:#667085;font-size:11px}
-.compliance-asset-card-model{color:#98a2b3!important}
+.compliance-asset-card-head b{color:var(--c-ink);font-size:13px}
+.compliance-asset-card h3{margin:0;color:var(--c-ink);font-size:14px;line-height:1.3}
+.compliance-asset-card p{margin:0;color:var(--c-muted);font-size:11px}
+.compliance-asset-card-model{color:var(--c-soft)!important}
 .compliance-asset-card-due{display:flex;align-items:baseline;gap:8px;padding:8px 10px;border-radius:9px;background:#f8fafb}
-.compliance-asset-card-due small{color:#667085;font-size:9px;text-transform:uppercase}
-.compliance-asset-card-due b{color:#17202a;font-size:13px}
-.compliance-asset-card-due span{margin-left:auto;color:#667085;font-size:10px}
-.compliance-asset-card-stats{display:flex;flex-wrap:wrap;gap:10px;color:#667085;font-size:10px}
-.compliance-asset-card-stats b{color:#17202a}
+.compliance-asset-card-due small{color:var(--c-muted);font-size:9px;text-transform:uppercase}
+.compliance-asset-card-due b{color:var(--c-ink);font-size:13px}
+.compliance-asset-card-due span{margin-left:auto;color:var(--c-muted);font-size:10px}
+.compliance-asset-card-stats{display:flex;flex-wrap:wrap;gap:10px;color:var(--c-muted);font-size:10px}
+.compliance-asset-card-stats b{color:var(--c-ink)}
 .compliance-asset-card-actions{display:flex;justify-content:flex-end}
 .compliance-asset-card-actions .secondary{min-height:34px;padding:6px 12px;font-size:10px}
 
 /* View toggle & table */
 .compliance-view-toggle{display:flex;gap:4px;padding:3px;border:1px solid #e3e8ec;border-radius:10px;background:#f5f7f8}
-.compliance-view-toggle button{min-height:32px;padding:5px 12px;border:0;border-radius:7px;background:transparent;color:#475467;font-size:10px;font-weight:800;cursor:pointer}
-.compliance-view-toggle button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
+.compliance-view-toggle button{min-height:32px;padding:5px 12px;border:0;border-radius:7px;background:transparent;color:var(--c-secondary);font-size:10px;font-weight:800;cursor:pointer}
+.compliance-view-toggle button.active{background:#fff;color:var(--c-ink);box-shadow:0 1px 4px rgba(16,24,40,.14)}
 .compliance-table-wrap{padding:0;overflow:auto}
 .compliance-table{width:100%;min-width:820px;border-collapse:collapse}
-.compliance-table th{padding:11px 14px;border-bottom:1px solid #e7ebee;background:#f8fafb;color:#667085;font-size:10px;font-weight:900;letter-spacing:.04em;text-align:left;text-transform:uppercase;white-space:nowrap}
-.compliance-table td{padding:12px 14px;border-bottom:1px solid #eef1f3;color:#344054;font-size:12px;vertical-align:middle}
-.compliance-table b{display:block;color:#17202a;font-size:12px}
+.compliance-table th{padding:11px 14px;border-bottom:1px solid #e7ebee;background:#f8fafb;color:var(--c-muted);font-size:10px;font-weight:900;letter-spacing:.04em;text-align:left;text-transform:uppercase;white-space:nowrap}
+.compliance-table td{padding:12px 14px;border-bottom:1px solid #eef1f3;color:var(--c-body);font-size:12px;vertical-align:middle}
+.compliance-table b{display:block;color:var(--c-ink);font-size:12px}
 .compliance-table small{display:block;margin-top:2px;color:#788491;font-size:10px}
 
 /* Asset detail */
 .compliance-asset-detail{display:grid;gap:16px}
 .compliance-asset-header{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:18px 20px;border:1px solid #e3e8ec;border-radius:16px;background:#fff}
 .compliance-asset-header h2{margin:2px 0;font-size:22px}
-.compliance-asset-header p{margin:0;color:#667085;font-size:12px}
-.compliance-asset-location{margin-left:auto;color:#475467;font-size:11px;font-weight:750}
+.compliance-asset-header p{margin:0;color:var(--c-muted);font-size:12px}
+.compliance-asset-location{margin-left:auto;color:var(--c-secondary);font-size:11px;font-weight:750}
 .compliance-asset-actions{display:flex;flex-wrap:wrap;gap:8px}
 .compliance-asset-actions button{min-height:40px}
 .compliance-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:3px;border:1px solid #e3e8ec;border-radius:11px;background:#f5f7f8;width:fit-content(100%);max-width:100%;overflow-x:auto}
-.compliance-tabs button{min-height:34px;padding:6px 12px;border:0;border-radius:8px;background:transparent;color:#475467;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}
-.compliance-tabs button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
+.compliance-tabs button{min-height:34px;padding:6px 12px;border:0;border-radius:8px;background:transparent;color:var(--c-secondary);font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer}
+.compliance-tabs button.active{background:#fff;color:var(--c-ink);box-shadow:0 1px 4px rgba(16,24,40,.14)}
 .compliance-tab-panel{display:grid;gap:14px}
 .compliance-overview-grid{grid-template-columns:1fr 1fr}
 .compliance-overview-grid .card{padding:18px}
@@ -131,22 +140,22 @@
 .compliance-overview-grid .link{margin-top:6px;padding:0;font-size:11px}
 .compliance-meta-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid #f0f2f4;font-size:11px}
 .compliance-meta-line:last-child{border-bottom:0}
-.compliance-meta-line span{color:#667085}
-.compliance-meta-line b{color:#17202a;text-align:right}
+.compliance-meta-line span{color:var(--c-muted)}
+.compliance-meta-line b{color:var(--c-ink);text-align:right}
 
 /* Obligation cards + list */
 .compliance-obligation-list{grid-template-columns:1fr;gap:10px}
 .compliance-obligation-card{cursor:pointer;transition:box-shadow .15s ease}
 .compliance-obligation-card:hover{box-shadow:0 8px 22px rgba(16,24,40,.1)}
 .compliance-obligation-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.compliance-obligation-head h4{margin:0;flex:1;min-width:120px;color:#17202a;font-size:13px}
-.compliance-obligation-card p{margin:6px 0 0;color:#475467;font-size:11px}
-.compliance-obligation-source{color:#98a2b3!important;font-size:10px!important}
+.compliance-obligation-head h4{margin:0;flex:1;min-width:120px;color:var(--c-ink);font-size:13px}
+.compliance-obligation-card p{margin:6px 0 0;color:var(--c-secondary);font-size:11px}
+.compliance-obligation-source{color:var(--c-soft)!important;font-size:10px!important}
 
 /* Mängel */
 .compliance-defect-card{display:grid;gap:6px}
 .compliance-defect-head{display:flex;align-items:center;justify-content:space-between}
-.compliance-defect-head b{color:#17202a;font-size:12px}
+.compliance-defect-head b{color:var(--c-ink);font-size:12px}
 .compliance-risk{padding:3px 8px;border-radius:999px;font-size:9px;font-weight:850}
 .compliance-risk.tone-hoch{background:#fee4e2;color:#b42318}
 .compliance-risk.tone-mittel{background:#fff4cc;color:#8a6100}
@@ -154,18 +163,18 @@
 .compliance-defect-card h4{margin:0;font-size:13px}
 
 /* Dokumente */
-.compliance-tab-hint{margin:0;color:#98a2b3;font-size:10px}
+.compliance-tab-hint{margin:0;color:var(--c-soft);font-size:10px}
 .compliance-doc-list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
-.compliance-doc-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid #eef1f3;border-radius:9px;background:#fff;font-size:11px;color:#344054}
-.compliance-doc-list small{color:#98a2b3;font-size:9px;text-transform:uppercase}
+.compliance-doc-list li{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid #eef1f3;border-radius:9px;background:#fff;font-size:11px;color:var(--c-body)}
+.compliance-doc-list small{color:var(--c-soft);font-size:9px;text-transform:uppercase}
 
 /* Historie */
 .compliance-history{display:grid;gap:0}
 .compliance-history-row{display:grid;grid-template-columns:90px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f4;font-size:11px}
 .compliance-history-row:last-child{border-bottom:0}
-.compliance-history-row b{color:#17202a}
-.compliance-history-row span{display:block;color:#344054}
-.compliance-history-row small{display:block;margin-top:2px;color:#98a2b3}
+.compliance-history-row b{color:var(--c-ink)}
+.compliance-history-row span{display:block;color:var(--c-body)}
+.compliance-history-row small{display:block;margin-top:2px;color:var(--c-soft)}
 
 /* Datenqualität */
 .compliance-quality-line{padding:5px 0;font-size:11px}
@@ -174,17 +183,17 @@
 
 /* Fälligkeitsübersicht */
 .compliance-chip-row{display:flex;flex-wrap:wrap;gap:8px}
-.compliance-chip{min-height:34px;padding:6px 14px;border:1px solid #d6dce3;border-radius:999px;background:#fff;color:#475467;font-size:11px;font-weight:800;cursor:pointer}
+.compliance-chip{min-height:34px;padding:6px 14px;border:1px solid #d6dce3;border-radius:999px;background:#fff;color:var(--c-secondary);font-size:11px;font-weight:800;cursor:pointer}
 .compliance-chip.active{border-color:#9dc31a;background:#f0f6e0;color:#4d6608}
-.compliance-group-title{display:flex;align-items:center;gap:8px;margin:6px 0 10px;color:#17202a;font-size:13px}
-.compliance-group-title span{padding:2px 8px;border-radius:999px;background:#eef1f4;color:#667085;font-size:10px;font-weight:850}
+.compliance-group-title{display:flex;align-items:center;gap:8px;margin:6px 0 10px;color:var(--c-ink);font-size:13px}
+.compliance-group-title span{padding:2px 8px;border-radius:999px;background:#eef1f4;color:var(--c-muted);font-size:10px;font-weight:850}
 .compliance-due-list{display:grid;gap:10px}
 .compliance-due-row{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px}
 .compliance-due-row>div:first-child{display:flex;align-items:center;gap:8px;min-width:0}
-.compliance-due-row>div:first-child b{color:#17202a;font-size:12px;white-space:nowrap}
-.compliance-due-row>div:first-child span{overflow:hidden;color:#667085;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.compliance-due-row>div:first-child b{color:var(--c-ink);font-size:12px;white-space:nowrap}
+.compliance-due-row>div:first-child span{overflow:hidden;color:var(--c-muted);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
 .compliance-due-line{display:grid;gap:2px;text-align:right}
-.compliance-due-line small{color:#667085;font-size:10px}
+.compliance-due-line small{color:var(--c-muted);font-size:10px}
 .compliance-due-row .secondary{min-height:34px;padding:6px 14px;font-size:10px}
 
 /* Obligation panel (zentriertes Modal, folgt dem .finding-drawer-Muster) */
@@ -196,43 +205,41 @@
 .compliance-derive-details{margin-top:14px;padding:12px;border:1px solid #e3e8ec;border-radius:12px;background:#fff}
 .compliance-derive-details summary{color:#4d6608;font-size:11px;font-weight:850;cursor:pointer}
 .compliance-derive-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 0}
-.compliance-derive-grid dt{color:#667085;font-size:9px;text-transform:uppercase}
-.compliance-derive-grid dd{margin:3px 0 0;color:#17202a;font-size:12px;font-weight:750}
+.compliance-derive-grid dt{color:var(--c-muted);font-size:9px;text-transform:uppercase}
+.compliance-derive-grid dd{margin:3px 0 0;color:var(--c-ink);font-size:12px;font-weight:750}
 .compliance-panel-actions{position:relative;z-index:1;flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e3e8ec;border-radius:0 0 22px 22px;background:rgba(255,255,255,.97)}
 
 /* Prüfung erfassen (Modal) */
 .compliance-modal-card *{min-width:0}
 .compliance-modal-card{width:min(720px,100%)}
 .compliance-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.compliance-form-grid>label{display:grid;gap:6px;color:#344054;font-size:12px;font-weight:800}
-.compliance-form-grid input,.compliance-form-grid select{min-height:42px;padding:9px 11px;border:1px solid #d6dce3;border-radius:10px;background:#fff;color:#17202a;font:inherit;font-size:13px;font-weight:600}
+.compliance-form-grid>label{display:grid;gap:6px;color:var(--c-body);font-size:12px;font-weight:800}
+.compliance-form-grid input,.compliance-form-grid select{min-height:42px;padding:9px 11px;border:1px solid #d6dce3;border-radius:10px;background:#fff;color:var(--c-ink);font:inherit;font-size:13px;font-weight:600}
 .compliance-form-wide{grid-column:1/-1}
 .compliance-result-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:6px}
-.compliance-result-btn{min-height:52px;padding:8px 10px;border:2px solid #d6dce3;border-radius:12px;background:#fff;color:#344054;font-size:10.5px;font-weight:850;letter-spacing:.02em;cursor:pointer}
+.compliance-result-btn{min-height:52px;padding:8px 10px;border:2px solid #d6dce3;border-radius:12px;background:#fff;color:var(--c-body);font-size:10.5px;font-weight:850;letter-spacing:.02em;cursor:pointer}
 .compliance-result-btn.active{border-color:#9dc31a;background:#f0f6e0;color:#3d5500}
 .compliance-evidence-list{display:flex;flex-wrap:wrap;gap:6px}
-.compliance-evidence-list span{padding:4px 9px;border-radius:7px;background:#eef1f4;color:#475467;font-size:10px}
+.compliance-evidence-list span{padding:4px 9px;border-radius:7px;background:#eef1f4;color:var(--c-secondary);font-size:10px}
 .compliance-evidence-check{margin:14px 0;padding:12px 14px;border-left:3px solid #9dc31a;border-radius:0 10px 10px 0;background:#f6f9ec;color:#3d5500;font-size:11px;line-height:1.6}
 .compliance-evidence-check b{display:block;margin-bottom:4px;font-size:10px;letter-spacing:.04em}
 .compliance-evidence-check span{display:block;margin-top:6px;font-weight:850}
 
-/* Dark mode */
-:root[data-theme="dark"] .compliance-breadcrumb{color:#98a2b3}
-:root[data-theme="dark"] .compliance-breadcrumb span{color:#f3f6f8}
+/* Dark mode: Hintergründe, Rahmen und Akzentfarben.
+   Textfarben laufen oben über --c-ink/--c-body/--c-muted/--c-secondary/--c-soft
+   und brauchen hier keine Einzel-Overrides mehr. */
 :root[data-theme="dark"] .compliance-view-toggle,:root[data-theme="dark"] .compliance-tabs{border-color:#3a4651;background:#202730}
-:root[data-theme="dark"] .compliance-kpi small,:root[data-theme="dark"] .compliance-kpi span,:root[data-theme="dark"] .compliance-metric-row,:root[data-theme="dark"] .compliance-critical-card ul{color:#b9c5d0}
 :root[data-theme="dark"] .compliance-view-toggle button.active,:root[data-theme="dark"] .compliance-tabs button.active{background:#2d3640;color:#f3f6f8}
-:root[data-theme="dark"] .compliance-kpi,:root[data-theme="dark"] .compliance-index-card,:root[data-theme="dark"] .compliance-critical-card,:root[data-theme="dark"] .compliance-site-card,:root[data-theme="dark"] .compliance-category-card,:root[data-theme="dark"] .compliance-asset-card,:root[data-theme="dark"] .compliance-table-wrap,:root[data-theme="dark"] .compliance-obligation-card,:root[data-theme="dark"] .compliance-defect-card,:root[data-theme="dark"] .compliance-asset-header,:root[data-theme="dark"] .compliance-panel,:root[data-theme="dark"] .compliance-panel-head,:root[data-theme="dark"] .compliance-panel-actions,:root[data-theme="dark"] .compliance-derive-details,:root[data-theme="dark"] .compliance-due-row,:root[data-theme="dark"] .compliance-overview-grid .card{border-color:#3a4651;background:#202730;color:#f3f6f8}
+:root[data-theme="dark"] .compliance-kpi,:root[data-theme="dark"] .compliance-index-card,:root[data-theme="dark"] .compliance-critical-card,:root[data-theme="dark"] .compliance-site-card,:root[data-theme="dark"] .compliance-category-card,:root[data-theme="dark"] .compliance-asset-card,:root[data-theme="dark"] .compliance-table-wrap,:root[data-theme="dark"] .compliance-obligation-card,:root[data-theme="dark"] .compliance-defect-card,:root[data-theme="dark"] .compliance-asset-header,:root[data-theme="dark"] .compliance-panel,:root[data-theme="dark"] .compliance-panel-head,:root[data-theme="dark"] .compliance-panel-actions,:root[data-theme="dark"] .compliance-derive-details,:root[data-theme="dark"] .compliance-due-row,:root[data-theme="dark"] .compliance-overview-grid .card{border-color:#3a4651;background:#202730}
 :root[data-theme="dark"] .compliance-panel{background:#192027}
-:root[data-theme="dark"] .compliance-kpi strong,:root[data-theme="dark"] .compliance-index-card h3,:root[data-theme="dark"] .compliance-metric-row b,:root[data-theme="dark"] .compliance-asset-card h3,:root[data-theme="dark"] .compliance-asset-card-due b,:root[data-theme="dark"] .compliance-table b,:root[data-theme="dark"] .compliance-meta-line b,:root[data-theme="dark"] .compliance-history-row b,:root[data-theme="dark"] .compliance-derive-grid dd,:root[data-theme="dark"] .compliance-asset-header h2{color:#f3f6f8}
 :root[data-theme="dark"] .compliance-index-value{color:#b7df48}
-:root[data-theme="dark"] .compliance-table th{background:#1a2128;color:#aeb9c3;border-color:rgba(255,255,255,.1)}
+:root[data-theme="dark"] .compliance-table th{background:#1a2128;border-color:rgba(255,255,255,.1)}
 :root[data-theme="dark"] .compliance-table td,:root[data-theme="dark"] .compliance-meta-line,:root[data-theme="dark"] .compliance-history-row{border-color:rgba(255,255,255,.08)}
-:root[data-theme="dark"] .compliance-doc-list li{border-color:#3a4651;background:#171d23;color:#d6dee7}
-:root[data-theme="dark"] .compliance-chip{border-color:#3a4651;background:#202730;color:#d6dee7}
+:root[data-theme="dark"] .compliance-doc-list li{border-color:#3a4651;background:#171d23}
+:root[data-theme="dark"] .compliance-chip{border-color:#3a4651;background:#202730}
 :root[data-theme="dark"] .compliance-chip.active{border-color:#9dc31a;background:#2d3920;color:#d9ee98}
-:root[data-theme="dark"] .compliance-form-grid input,:root[data-theme="dark"] .compliance-form-grid select{border-color:#3a4651;background:#171d23;color:#f3f6f8}
-:root[data-theme="dark"] .compliance-result-btn{border-color:#3a4651;background:#171d23;color:#d6dee7}
+:root[data-theme="dark"] .compliance-form-grid input,:root[data-theme="dark"] .compliance-form-grid select{border-color:#3a4651;background:#171d23}
+:root[data-theme="dark"] .compliance-result-btn{border-color:#3a4651;background:#171d23}
 :root[data-theme="dark"] .compliance-result-btn.active{border-color:#9dc31a;background:#2d3920;color:#d9ee98}
 :root[data-theme="dark"] .compliance-evidence-check{background:#263419;color:#d9ee98}
 :root[data-theme="dark"] .compliance-status.tone-valid{background:#1f4936;color:#a7ebc2}
@@ -245,14 +252,18 @@
 :root[data-theme="dark"] .compliance-type-tag{background:#2a333d;color:#c3ccd6}
 :root[data-theme="dark"] .compliance-type-tag.is-maintenance{background:#1f3350;color:#bcd6ff}
 :root[data-theme="dark"] .compliance-type-tag.is-inspection{background:#2d3920;color:#d9ee98}
-:root[data-theme="dark"] .compliance-site-stats strong,:root[data-theme="dark"] .compliance-asset-card-head b,:root[data-theme="dark"] .compliance-asset-card-stats b,:root[data-theme="dark"] .compliance-obligation-head h4,:root[data-theme="dark"] .compliance-defect-head b,:root[data-theme="dark"] .compliance-group-title,:root[data-theme="dark"] .compliance-due-row>div:first-child b{color:#f3f6f8}
-:root[data-theme="dark"] .compliance-empty-inline,:root[data-theme="dark"] .compliance-section-head p,:root[data-theme="dark"] .compliance-site-stats span,:root[data-theme="dark"] .compliance-category-card>div>span,:root[data-theme="dark"] .compliance-category-card li,:root[data-theme="dark"] .compliance-asset-card p,:root[data-theme="dark"] .compliance-asset-card-due small,:root[data-theme="dark"] .compliance-asset-card-due span,:root[data-theme="dark"] .compliance-asset-card-stats,:root[data-theme="dark"] .compliance-view-toggle button,:root[data-theme="dark"] .compliance-asset-header p,:root[data-theme="dark"] .compliance-asset-location,:root[data-theme="dark"] .compliance-tabs button,:root[data-theme="dark"] .compliance-meta-line span,:root[data-theme="dark"] .compliance-obligation-card p,:root[data-theme="dark"] .compliance-risk.tone-niedrig,:root[data-theme="dark"] .compliance-due-row>div:first-child span,:root[data-theme="dark"] .compliance-due-line small,:root[data-theme="dark"] .compliance-derive-grid dt,:root[data-theme="dark"] .compliance-evidence-list span{color:#b9c5d0}
-:root[data-theme="dark"] .compliance-breadcrumb i,:root[data-theme="dark"] .compliance-tab-hint,:root[data-theme="dark"] .compliance-doc-list small,:root[data-theme="dark"] .compliance-history-row small{color:#8b97a3}
-:root[data-theme="dark"] .compliance-asset-card-model,:root[data-theme="dark"] .compliance-obligation-source{color:#8b97a3!important}
 :root[data-theme="dark"] .compliance-group-title span{background:#2a333d;color:#c3ccd6}
 :root[data-theme="dark"] .compliance-category-card li.is-overdue{color:#ffb4ad}
 :root[data-theme="dark"] .compliance-category-card li.is-due{color:#ffc891}
 :root[data-theme="dark"] .compliance-category-card li.is-valid{color:#a7ebc2}
+:root[data-theme="dark"] .compliance-asset-card-due{background:#171d23}
+:root[data-theme="dark"] .compliance-metric-track{background:#2a333d}
+:root[data-theme="dark"] .compliance-evidence-list span{background:#2a333d}
+:root[data-theme="dark"] .compliance-risk.tone-hoch{background:#552b28;color:#ffb4ad}
+:root[data-theme="dark"] .compliance-risk.tone-mittel{background:#4e4320;color:#ffe7a1}
+:root[data-theme="dark"] .compliance-risk.tone-niedrig{background:#2a333d}
+:root[data-theme="dark"] .compliance-derive-details{background:#202730}
+:root[data-theme="dark"] .compliance-derive-details summary{color:#c3e15c}
 
 /* Responsive */
 @media(max-width:1150px){.compliance-summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-site-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-overview-grid{grid-template-columns:1fr}}
