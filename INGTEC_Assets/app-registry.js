@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const VERSION='1.2.2';
+  const VERSION='1.3.0';
   const GROUPS=[
     {id:'work',label:'Arbeit & Prüfung',description:'Operative Arbeit vom Auftrag bis zur Freigabe.'},
     {id:'planning',label:'Planung & Zusammenarbeit',description:'Termine, Zusammenarbeit und freigegebene Kundensicht.'},
@@ -88,6 +88,14 @@
         {id:'assets',label:'Alle Anlagen',page:'compliance',icon:'objects',path:'anlagen',screenAdapter:'complianceSetScreen',screen:'assets'},
         {id:'due',label:'Fälligkeiten',page:'compliance',icon:'calendar',path:'faelligkeiten',screenAdapter:'complianceSetScreen',screen:'due'}
       ],legacyIds:['compliance','assets']
+    },
+    {
+      id:'emails',code:'APP-15',slug:'emails',name:'E-Mails',
+      description:'Lokales Postfach mit echtem Versand über dein Mailprogramm.',
+      icon:'emails',page:'emails',group:'planning',navigation:[
+        {id:'inbox',label:'Posteingang',page:'emails',icon:'emails',path:'',screenAdapter:'emailSetScreen',screen:'inbox'},
+        {id:'sent',label:'Gesendet',page:'emails',icon:'emails',path:'gesendet',screenAdapter:'emailSetScreen',screen:'sent'}
+      ],legacyIds:['emails','mail']
     },
     {
       id:'termine',code:'APP-10',slug:'termine',name:'Termine & Planung',
@@ -242,7 +250,7 @@
       dashboard:'arbeitsplatz',orders:'auftraege',calendar:'termine',master:'kunden-objekte',
       inspection:'pruefungen',findings:'pruefungen',measures:'pruefungen',reports:'berichte',
       intelligence:'safety-score',knowledge:'wissen',chats:'teamarbeit',documents:'dokumente',
-      customer:'kundenportal',billing:'abrechnung',compliance:'pruefpflichten',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
+      customer:'kundenportal',billing:'abrechnung',compliance:'pruefpflichten',emails:'emails',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
     }[page];
     const chosen=candidates.find(candidate=>candidate.app.id===preferred)||candidates[0];
     return context(chosen.app,chosen.item.id);
@@ -290,6 +298,7 @@
       {name:'Bestehende Prüfungslinks werden in den App-Kontext überführt',passed:legacy?.app?.id==='pruefungen'},
       {name:'Abrechnung ist als eigene Fach-App aktiviert',passed:appFor('abrechnung')?.enabled!==false&&appFor('abrechnung')?.navigation?.[0]?.page==='billing'},
       {name:'Prüfpflichten ist als eigene Fach-App mit drei Bereichen aktiviert',passed:(()=>{const compliance=appFor('pruefpflichten');return compliance?.enabled!==false&&JSON.stringify(compliance?.navigation?.map(item=>item.id))===JSON.stringify(['portfolio','assets','due']);})()},
+      {name:'E-Mails ist als eigene Fach-App mit Posteingang und Gesendet aktiviert',passed:(()=>{const mail=appFor('emails');return mail?.enabled!==false&&JSON.stringify(mail?.navigation?.map(item=>item.id))===JSON.stringify(['inbox','sent']);})()},
       {name:'Weitere geplante Fachmodule bleiben registriert',passed:comingSoonApps().length>=3}
     ];
     return {passed:tests.every(test=>test.passed),tests,runAt:new Date().toISOString()};

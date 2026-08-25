@@ -1,4 +1,4 @@
-const CACHE_VERSION='ingtec-inspect-v2.5.41';
+const CACHE_VERSION='ingtec-inspect-v2.5.42';
 const APP_SHELL=[
   './',
   './index.html',
@@ -27,6 +27,8 @@ const APP_SHELL=[
   './INGTEC_Assets/billing-workspace.js',
   './INGTEC_Assets/compliance-workspace.css',
   './INGTEC_Assets/compliance-workspace.js',
+  './INGTEC_Assets/email-workspace.css',
+  './INGTEC_Assets/email-workspace.js',
   './INGTEC_Assets/report-pdf.js',
   './INGTEC_Assets/ingtec-logo-light.svg',
   './INGTEC_Assets/ingtec-logo-dark.svg'
