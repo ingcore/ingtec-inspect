@@ -14,7 +14,6 @@
   const now=()=>new Date().toISOString();
   const EMAIL_PATTERN=/^[^\s@<>,;]+@[^\s@<>,;]+\.[^\s@<>,;]+$/u;
   const COMPOSE_URL_LIMIT=8192;
-  const OUTLOOK_DEFAULT_APPS_URL='ms-settings:defaultapps?registeredAUMID=Microsoft.OutlookForWindows_8wekyb3d8bbwe%21Microsoft.OutlookforWindows';
   const actor=()=>{
     const account=typeof activeUserAccount==='function'?activeUserAccount():null;
     return {id:account?.id||'LOCAL-DEMO',name:account?.name||state.user?.name||'Lokale Demo',email:account?.email||state.user?.email||'hannes.steiner@ingtec.at'};
@@ -246,17 +245,6 @@
       return false;
     }
   }
-  function openOutlookDefaultSettings(modal){
-    if(!requestExternalCompose(OUTLOOK_DEFAULT_APPS_URL)){
-      const message='Die Windows-Einstellungen konnten nicht geöffnet werden. Wähle Outlook manuell als Standard-App für MAILTO aus.';
-      showLaunchStatus(modal,message,true);
-      showToast?.(message,null,null,'error');
-      return;
-    }
-    const message='Die Windows-Einstellungen wurden geöffnet. Wähle dort Outlook als Standard-App für MAILTO aus und kehre anschließend hierher zurück.';
-    showLaunchStatus(modal,message);
-    showToast?.('Windows-Einstellungen für die Outlook-Standard-App wurden geöffnet.');
-  }
   function showLaunchStatus(modal,message,isError=false){
     const status=modal.querySelector('[data-email-launch-status]');
     if(!status)return;
@@ -329,12 +317,12 @@
   }
   function composeMarkup(){
     const ctx=composeContext||{};
-    return `<div class="modal-card email-modal-card" role="dialog" aria-modal="true" aria-labelledby="emailComposeTitle"><div class="modal-head"><div><span class="eyebrow">${esc(ctx.kicker||'Neue E-Mail')}</span><h2 id="emailComposeTitle">${esc(ctx.title||'E-Mail verfassen')}</h2><p>Der Entwurf wird an dein Mailprogramm oder Outlook im Browser übergeben. Gesendet wird erst nach deinem Klick auf „Senden" dort.</p></div><button type="button" class="modal-close" aria-label="Dialog schließen" data-email-close>×</button></div><form id="emailComposeForm" novalidate><div class="email-form-grid">
+    return `<div class="modal-card email-modal-card" role="dialog" aria-modal="true" aria-labelledby="emailComposeTitle"><div class="modal-head"><div><span class="eyebrow">${esc(ctx.kicker||'Neue E-Mail')}</span><h2 id="emailComposeTitle">${esc(ctx.title||'E-Mail verfassen')}</h2><p>Der Entwurf wird direkt in Outlook im Browser geöffnet. Gesendet wird erst nach deinem Klick auf „Senden" dort.</p></div><button type="button" class="modal-close" aria-label="Dialog schließen" data-email-close>×</button></div><form id="emailComposeForm" novalidate><div class="email-form-grid">
       <label class="email-form-wide">An *<input name="to" type="email" multiple required maxlength="500" autocomplete="email" value="${esc(ctx.to||'')}" placeholder="empfaenger@beispiel.at"></label>
       ${composeShowCc?`<label class="email-form-wide">Cc<input name="cc" type="email" multiple maxlength="500" value="${esc(ctx.cc||'')}" placeholder="optional"></label>`:`<div class="email-form-wide"><button type="button" class="link" data-email-toggle-cc>+ Cc hinzufügen</button></div>`}
       <label class="email-form-wide">Betreff *<input name="subject" required maxlength="240" value="${esc(ctx.subject||'')}"></label>
       <label class="email-form-wide">Nachricht *<textarea name="body" required maxlength="6000">${esc(ctx.body||'')}</textarea></label>
-    </div><p class="email-launch-status" data-email-launch-status role="status" aria-live="polite" hidden></p><div class="modal-actions email-compose-actions"><button type="button" class="secondary" data-email-copy>Text kopieren</button><button type="button" class="secondary" data-email-default-outlook>Outlook als Standard einrichten</button><button type="button" class="secondary" data-email-outlook-web>Outlook im Browser öffnen</button><button type="button" class="secondary" data-email-close>Abbrechen</button><button type="submit" class="primary" data-email-mailto>E-Mail-App öffnen</button></div></form></div>`;
+    </div><p class="email-launch-status" data-email-launch-status role="status" aria-live="polite" hidden></p><div class="modal-actions email-compose-actions"><button type="button" class="secondary" data-email-copy>Text kopieren</button><button type="button" class="secondary" data-email-mailto>Andere Mail-App (mailto)</button><button type="button" class="secondary" data-email-close>Abbrechen</button><button type="submit" class="primary">Outlook öffnen</button></div></form></div>`;
   }
   function renderCompose(){
     const modal=document.getElementById('emailComposeDialog');
@@ -347,9 +335,8 @@
       const copied=await copyText(`An: ${values.recipients.join(', ')}${values.cc.length?`\nCc: ${values.cc.join(', ')}`:''}\nBetreff: ${values.subject}\n\n${values.body}`);
       showToast?.(copied?'E-Mail-Text wurde in die Zwischenablage kopiert.':'Der E-Mail-Text konnte nicht kopiert werden.',null,null,copied?undefined:'error');
     });
-    modal.querySelector('[data-email-default-outlook]')?.addEventListener('click',()=>openOutlookDefaultSettings(modal));
-    modal.querySelector('[data-email-outlook-web]')?.addEventListener('click',()=>launchEmailClient(modal,'outlook-web'));
-    modal.querySelector('#emailComposeForm')?.addEventListener('submit',event=>{event.preventDefault();launchEmailClient(modal,'mailto');});
+    modal.querySelector('[data-email-mailto]')?.addEventListener('click',()=>launchEmailClient(modal,'mailto'));
+    modal.querySelector('#emailComposeForm')?.addEventListener('submit',event=>{event.preventDefault();launchEmailClient(modal,'outlook-web');});
     if(typeof enhanceFormControls==='function')enhanceFormControls(modal);
     setTimeout(()=>modal.querySelector('input[name="to"]')?.focus(),50);
   }
