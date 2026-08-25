@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const VERSION='1.2.0';
+  const VERSION='1.2.2';
   const GROUPS=[
     {id:'work',label:'Arbeit & Prüfung',description:'Operative Arbeit vom Auftrag bis zur Freigabe.'},
     {id:'planning',label:'Planung & Zusammenarbeit',description:'Termine, Zusammenarbeit und freigegebene Kundensicht.'},
@@ -84,7 +84,9 @@
       id:'pruefpflichten',code:'APP-20',slug:'pruefpflichten',name:'Prüfpflichten',
       description:'Anlagen, Prüfpflichten und Fälligkeiten im Blick.',
       icon:'compliance',page:'compliance',group:'work',navigation:[
-        {id:'overview',label:'Prüfpflichten',page:'compliance',icon:'compliance',path:''}
+        {id:'portfolio',label:'Portfolio',page:'compliance',icon:'compliance',path:'',screenAdapter:'complianceSetScreen',screen:'portfolio'},
+        {id:'assets',label:'Alle Anlagen',page:'compliance',icon:'objects',path:'anlagen',screenAdapter:'complianceSetScreen',screen:'assets'},
+        {id:'due',label:'Fälligkeiten',page:'compliance',icon:'calendar',path:'faelligkeiten',screenAdapter:'complianceSetScreen',screen:'due'}
       ],legacyIds:['compliance','assets']
     },
     {
@@ -287,7 +289,7 @@
       {name:'Teamarbeit mappt Aufgaben auf den bestehenden Collaboration-Bereich',passed:teamwork?.app?.id==='teamarbeit'&&teamwork?.item?.collabArea==='tasks'},
       {name:'Bestehende Prüfungslinks werden in den App-Kontext überführt',passed:legacy?.app?.id==='pruefungen'},
       {name:'Abrechnung ist als eigene Fach-App aktiviert',passed:appFor('abrechnung')?.enabled!==false&&appFor('abrechnung')?.navigation?.[0]?.page==='billing'},
-      {name:'Prüfpflichten ist als eigene Fach-App aktiviert',passed:appFor('pruefpflichten')?.enabled!==false&&appFor('pruefpflichten')?.navigation?.[0]?.page==='compliance'},
+      {name:'Prüfpflichten ist als eigene Fach-App mit drei Bereichen aktiviert',passed:(()=>{const compliance=appFor('pruefpflichten');return compliance?.enabled!==false&&JSON.stringify(compliance?.navigation?.map(item=>item.id))===JSON.stringify(['portfolio','assets','due']);})()},
       {name:'Weitere geplante Fachmodule bleiben registriert',passed:comingSoonApps().length>=3}
     ];
     return {passed:tests.every(test=>test.passed),tests,runAt:new Date().toISOString()};

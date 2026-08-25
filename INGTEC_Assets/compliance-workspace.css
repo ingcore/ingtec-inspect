@@ -11,11 +11,9 @@
 .compliance-breadcrumb button:hover{text-decoration:underline}
 .compliance-breadcrumb span{color:#17202a;font-weight:850}
 .compliance-breadcrumb i{color:#98a2b3;font-style:normal}
-.compliance-quicknav{display:flex;gap:6px;padding:4px;border:1px solid #e3e8ec;border-radius:12px;background:#f5f7f8;width:fit-content(100%);max-width:100%;overflow-x:auto}
-.compliance-quicknav button{min-height:36px;padding:6px 14px;border:0;border-radius:9px;background:transparent;color:#475467;font-size:11px;font-weight:800;cursor:pointer}
-.compliance-quicknav button.active{background:#fff;color:#17202a;box-shadow:0 1px 4px rgba(16,24,40,.14)}
 
 /* KPI + index */
+.compliance-portfolio{display:grid;gap:18px}
 .compliance-summary-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
 .compliance-kpi{display:grid;gap:4px;min-height:104px;padding:16px;border-top:3px solid #9dc31a}
 .compliance-kpi small{color:#667085;font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}
@@ -221,11 +219,13 @@
 /* Dark mode */
 :root[data-theme="dark"] .compliance-breadcrumb{color:#98a2b3}
 :root[data-theme="dark"] .compliance-breadcrumb span{color:#f3f6f8}
-:root[data-theme="dark"] .compliance-quicknav,:root[data-theme="dark"] .compliance-view-toggle,:root[data-theme="dark"] .compliance-tabs{border-color:#3a4651;background:#202730}
-:root[data-theme="dark"] .compliance-quicknav button.active,:root[data-theme="dark"] .compliance-view-toggle button.active,:root[data-theme="dark"] .compliance-tabs button.active{background:#2d3640;color:#f3f6f8}
+:root[data-theme="dark"] .compliance-view-toggle,:root[data-theme="dark"] .compliance-tabs{border-color:#3a4651;background:#202730}
+:root[data-theme="dark"] .compliance-kpi small,:root[data-theme="dark"] .compliance-kpi span,:root[data-theme="dark"] .compliance-metric-row,:root[data-theme="dark"] .compliance-critical-card ul{color:#b9c5d0}
+:root[data-theme="dark"] .compliance-view-toggle button.active,:root[data-theme="dark"] .compliance-tabs button.active{background:#2d3640;color:#f3f6f8}
 :root[data-theme="dark"] .compliance-kpi,:root[data-theme="dark"] .compliance-index-card,:root[data-theme="dark"] .compliance-critical-card,:root[data-theme="dark"] .compliance-site-card,:root[data-theme="dark"] .compliance-category-card,:root[data-theme="dark"] .compliance-asset-card,:root[data-theme="dark"] .compliance-table-wrap,:root[data-theme="dark"] .compliance-obligation-card,:root[data-theme="dark"] .compliance-defect-card,:root[data-theme="dark"] .compliance-asset-header,:root[data-theme="dark"] .compliance-panel,:root[data-theme="dark"] .compliance-panel-head,:root[data-theme="dark"] .compliance-panel-actions,:root[data-theme="dark"] .compliance-derive-details,:root[data-theme="dark"] .compliance-due-row,:root[data-theme="dark"] .compliance-overview-grid .card{border-color:#3a4651;background:#202730;color:#f3f6f8}
 :root[data-theme="dark"] .compliance-panel{background:#192027}
-:root[data-theme="dark"] .compliance-kpi strong,:root[data-theme="dark"] .compliance-index-card h3,:root[data-theme="dark"] .compliance-asset-card h3,:root[data-theme="dark"] .compliance-asset-card-due b,:root[data-theme="dark"] .compliance-table b,:root[data-theme="dark"] .compliance-meta-line b,:root[data-theme="dark"] .compliance-history-row b,:root[data-theme="dark"] .compliance-derive-grid dd,:root[data-theme="dark"] .compliance-asset-header h2{color:#f3f6f8}
+:root[data-theme="dark"] .compliance-kpi strong,:root[data-theme="dark"] .compliance-index-card h3,:root[data-theme="dark"] .compliance-metric-row b,:root[data-theme="dark"] .compliance-asset-card h3,:root[data-theme="dark"] .compliance-asset-card-due b,:root[data-theme="dark"] .compliance-table b,:root[data-theme="dark"] .compliance-meta-line b,:root[data-theme="dark"] .compliance-history-row b,:root[data-theme="dark"] .compliance-derive-grid dd,:root[data-theme="dark"] .compliance-asset-header h2{color:#f3f6f8}
+:root[data-theme="dark"] .compliance-index-value{color:#b7df48}
 :root[data-theme="dark"] .compliance-table th{background:#1a2128;color:#aeb9c3;border-color:rgba(255,255,255,.1)}
 :root[data-theme="dark"] .compliance-table td,:root[data-theme="dark"] .compliance-meta-line,:root[data-theme="dark"] .compliance-history-row{border-color:rgba(255,255,255,.08)}
 :root[data-theme="dark"] .compliance-doc-list li{border-color:#3a4651;background:#171d23;color:#d6dee7}
@@ -245,6 +245,14 @@
 :root[data-theme="dark"] .compliance-type-tag{background:#2a333d;color:#c3ccd6}
 :root[data-theme="dark"] .compliance-type-tag.is-maintenance{background:#1f3350;color:#bcd6ff}
 :root[data-theme="dark"] .compliance-type-tag.is-inspection{background:#2d3920;color:#d9ee98}
+:root[data-theme="dark"] .compliance-site-stats strong,:root[data-theme="dark"] .compliance-asset-card-head b,:root[data-theme="dark"] .compliance-asset-card-stats b,:root[data-theme="dark"] .compliance-obligation-head h4,:root[data-theme="dark"] .compliance-defect-head b,:root[data-theme="dark"] .compliance-group-title,:root[data-theme="dark"] .compliance-due-row>div:first-child b{color:#f3f6f8}
+:root[data-theme="dark"] .compliance-empty-inline,:root[data-theme="dark"] .compliance-section-head p,:root[data-theme="dark"] .compliance-site-stats span,:root[data-theme="dark"] .compliance-category-card>div>span,:root[data-theme="dark"] .compliance-category-card li,:root[data-theme="dark"] .compliance-asset-card p,:root[data-theme="dark"] .compliance-asset-card-due small,:root[data-theme="dark"] .compliance-asset-card-due span,:root[data-theme="dark"] .compliance-asset-card-stats,:root[data-theme="dark"] .compliance-view-toggle button,:root[data-theme="dark"] .compliance-asset-header p,:root[data-theme="dark"] .compliance-asset-location,:root[data-theme="dark"] .compliance-tabs button,:root[data-theme="dark"] .compliance-meta-line span,:root[data-theme="dark"] .compliance-obligation-card p,:root[data-theme="dark"] .compliance-risk.tone-niedrig,:root[data-theme="dark"] .compliance-due-row>div:first-child span,:root[data-theme="dark"] .compliance-due-line small,:root[data-theme="dark"] .compliance-derive-grid dt,:root[data-theme="dark"] .compliance-evidence-list span{color:#b9c5d0}
+:root[data-theme="dark"] .compliance-breadcrumb i,:root[data-theme="dark"] .compliance-tab-hint,:root[data-theme="dark"] .compliance-doc-list small,:root[data-theme="dark"] .compliance-history-row small{color:#8b97a3}
+:root[data-theme="dark"] .compliance-asset-card-model,:root[data-theme="dark"] .compliance-obligation-source{color:#8b97a3!important}
+:root[data-theme="dark"] .compliance-group-title span{background:#2a333d;color:#c3ccd6}
+:root[data-theme="dark"] .compliance-category-card li.is-overdue{color:#ffb4ad}
+:root[data-theme="dark"] .compliance-category-card li.is-due{color:#ffc891}
+:root[data-theme="dark"] .compliance-category-card li.is-valid{color:#a7ebc2}
 
 /* Responsive */
 @media(max-width:1150px){.compliance-summary-row{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-site-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.compliance-overview-grid{grid-template-columns:1fr}}

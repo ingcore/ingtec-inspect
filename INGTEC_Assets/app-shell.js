@@ -194,6 +194,11 @@
     const navAccess=registry.navigationAvailability(context.app,context.item);
     return Boolean(appAccess.launchable&&navAccess.launchable);
   }
+  function applyScreenAdapter(item){
+    const adapter=typeof item?.screenAdapter==='string'?window[item.screenAdapter]:null;
+    if(typeof adapter!=='function')return;
+    try{adapter(item.screen);}catch(error){}
+  }
   function firstAllowedContext(appValue){
     const app=registry.appFor(appValue);
     if(!app)return null;
@@ -206,6 +211,7 @@
     if(!isAppContext(context)||!contextIsAllowed(context))return false;
     if(history)writeRoute(context,{replace});
     setContext(context);
+    applyScreenAdapter(context.item);
     refreshNavigation();
     state.applyingRoute=true;
     try{
@@ -394,6 +400,7 @@
         const next=contextForPage(page);
         if(next&&contextIsAllowed(next)){
           setContext(next);
+          applyScreenAdapter(next.item);
           writeRoute(next);
           refreshNavigation();
         }

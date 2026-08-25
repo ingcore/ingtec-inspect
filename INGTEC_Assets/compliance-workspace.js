@@ -274,11 +274,29 @@
   let assetsViewMode='grid';
   let dueFilter='all';
   let inspectionContext=null;
+  const TOP_LEVEL_SCREENS=new Set(['portfolio','assets','due']);
 
   function navigate(patch){
     view={...view,...patch};
     window.renderAll?.();
     setActivePage?.('compliance');
+  }
+  function setComplianceScreen(screen){
+    if(!TOP_LEVEL_SCREENS.has(screen))return false;
+    view={screen,siteId:null,category:null,assetId:null,obligationId:null,assetTab:'uebersicht',expandCalc:false};
+    dueFilter='all';
+    const current=document.getElementById('compliance');
+    if(current){
+      const template=document.createElement('template');
+      template.innerHTML=page();
+      const replacement=template.content.firstElementChild;
+      if(replacement){
+        if(current.classList.contains('active'))replacement.classList.add('active');
+        if(current.style.display)replacement.style.display=current.style.display;
+        current.replaceWith(replacement);
+      }
+    }
+    return true;
   }
   function breadcrumb(){
     const crumbs=[{label:'Prüfpflichten',screen:'portfolio'}];
@@ -291,14 +309,6 @@
     if(view.screen==='due')crumbs.push({label:'Fälligkeiten',screen:'due'});
     return `<nav class="compliance-breadcrumb" aria-label="Pfad">${crumbs.map((c,i)=>i===crumbs.length-1?`<span aria-current="page">${esc(c.label)}</span>`:`<button type="button" data-compliance-nav="${esc(c.screen)}" data-compliance-site="${esc(view.siteId||'')}">${esc(c.label)}</button>`).join('<i aria-hidden="true">›</i>')}</nav>`;
   }
-  function quickNav(){
-    return `<div class="compliance-quicknav" role="tablist" aria-label="Prüfpflichten-Bereiche">
-      <button type="button" role="tab" class="${view.screen==='portfolio'?'active':''}" data-compliance-nav="portfolio">Portfolio</button>
-      <button type="button" role="tab" class="${view.screen==='assets'&&!view.siteId?'active':''}" data-compliance-nav="assets">Alle Anlagen</button>
-      <button type="button" role="tab" class="${view.screen==='due'?'active':''}" data-compliance-nav="due">Fälligkeiten</button>
-    </div>`;
-  }
-
   function kpiTile(label,value,hint,alert){
     return `<article class="card compliance-kpi ${alert?'is-alert':''}"><small>${esc(label)}</small><strong>${esc(value)}</strong><span>${esc(hint)}</span></article>`;
   }
@@ -632,10 +642,11 @@
     else if(view.screen==='asset')body=assetDetailScreen();
     else if(view.screen==='due')body=dueScreen();
     else body=portfolioScreen();
-    return `<section class="page compliance-workspace" id="compliance"><div class="section-head compliance-page-head"><div><span class="eyebrow">Asset Compliance</span><h2>Prüfpflichten</h2><p>Anlagen, Prüfpflichten und Fälligkeiten auf einen Blick.</p></div></div>${breadcrumb()}${quickNav()}${body}</section>`;
+    return `<section class="page compliance-workspace" id="compliance"><div class="section-head compliance-page-head"><div><span class="eyebrow">Asset Compliance</span><h2>Prüfpflichten</h2><p>Anlagen, Prüfpflichten und Fälligkeiten auf einen Blick.</p></div></div>${breadcrumb()}${body}</section>`;
   }
 
   window.compliance=page;
+  window.complianceSetScreen=setComplianceScreen;
   window.closeComplianceObligationPanel=closeObligationPanel;
   window.closeComplianceCaptureDialog=closeInspectionDialog;
   window.runComplianceWorkspaceTests=function(){
@@ -650,6 +661,7 @@
       {name:'Portfolio-Kennzahlen liegen zwischen 0 und 100 %',passed:(()=>{const m=coverageMetrics(assets());return [m.assetCoverage,m.obligationCoverage,m.scheduleCompliance,m.evidenceCoverage,m.index].every(v=>v>=0&&v<=100);})()},
       {name:'Fälligkeitsherleitung liefert die Kernfelder',passed:asset&&asset.obligations[0]&&obligationDeriveMarkup(asset.obligations[0]).includes('Berechnungsversion')},
       {name:'Schreibende Aktionen sind berechtigungsgeschützt',passed:String(openInspectionDialog).includes('requirePermission')&&String(submitInspection).includes('requirePermission')},
+      {name:'Die Seiten-Navigation kann alle drei Prüfpflichten-Bereiche öffnen',passed:[...TOP_LEVEL_SCREENS].every(screen=>typeof window.complianceSetScreen==='function'&&TOP_LEVEL_SCREENS.has(screen))},
       {name:'Die Fachseite stellt Portfolio-, Standort-, Anlagen- und Fälligkeitsansicht bereit',passed:page().includes('compliance-portfolio')}
     ];
     return {passed:tests.every(t=>t.passed),tests};
@@ -668,8 +680,11 @@
       const screen=nav.dataset.complianceNav;
       const patch={screen};
       if(nav.dataset.complianceSite)patch.siteId=nav.dataset.complianceSite||null;
-      if(screen==='portfolio'){patch.siteId=null;patch.category=null;patch.assetId=null;}
-      if(screen==='assets')patch.category=nav.dataset.complianceCategory||null;
+      if(screen==='portfolio'){patch.siteId=null;patch.category=null;patch.assetId=null;patch.obligationId=null;patch.assetTab='uebersicht';}
+      if(screen==='assets'){
+        patch.category=nav.dataset.complianceCategory||null;
+      }
+      if(screen==='due'){patch.siteId=null;patch.category=null;patch.assetId=null;patch.obligationId=null;}
       if(screen==='site')patch.category=null;
       navigate(patch);
       return;

@@ -1,4 +1,4 @@
-const CACHE_VERSION='ingtec-inspect-v2.5.39';
+const CACHE_VERSION='ingtec-inspect-v2.5.41';
 const APP_SHELL=[
   './',
   './index.html',
