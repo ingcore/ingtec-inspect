@@ -305,6 +305,8 @@ const nav=[
   ['measures','Maßnahmen','measures','Prüfungen-Business'],
   ['reports','Berichte','reports','Prüfungen-Business'],
   ['compliance','Prüfpflichten','compliance','Prüfungen-Business'],
+  ['pruefbefund','Prüfbefunde','pruefbefund','Prüfungen-Business'],
+  ['bsb','BSB','bsb','Prüfungen-Business'],
   ['billing','Abrechnung','billing','Verwaltung'],
   ['intelligence','Wissen','knowledge','Wissen'],
   ['knowledge','Wiki','wiki','Wissen'],
@@ -905,7 +907,7 @@ const rolePermissionDefinitions=[
   {id:'manageUsers',label:'Mitglieder verwalten',description:'Profile anlegen, bearbeiten und löschen.'},
   {id:'manageRoles',label:'Rollen und Rechte verwalten',description:'Rollen erstellen, Berechtigungen festlegen und zuweisen.'}
 ];
-const accessPagePermission={orders:'objects',calendar:'calendar',chats:'chats',emails:'chats',master:'objects',inspection:'inspection',findings:'findings',measures:'measures',reports:'reports',billing:'reports',compliance:'inspection',documents:'documents',customer:'customer',testprofiles:'testProfiles',intelligence:'reports',knowledge:'documents'};
+const accessPagePermission={orders:'objects',calendar:'calendar',chats:'chats',emails:'chats',master:'objects',inspection:'inspection',findings:'findings',measures:'measures',reports:'reports',billing:'reports',compliance:'inspection',pruefbefund:'inspection',bsb:'inspection',documents:'documents',customer:'customer',testprofiles:'testProfiles',intelligence:'reports',knowledge:'documents'};
 const employeeOperationalPermissions=['calendar','chats','objects','inspection','findings','measures','reports','documents','customer'];
 function rolePermissionDefaults(roleId){
   const permissions=Object.fromEntries(rolePermissionDefinitions.map(definition=>[definition.id,false]));
@@ -4336,6 +4338,8 @@ function navIconMarkup(pageId,icon){
     reports:'<path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6"/>',
     billing:'<path d="M5 3.5h14v17L16.5 19 14 20.5 11.5 19 9 20.5 5 18zM8 8h8M8 12h6M8 16h4"/>',
     compliance:'<path d="M8 3.5h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21.5H8A1.5 1.5 0 0 1 6.5 20V5A1.5 1.5 0 0 1 8 3.5Z"/><path d="M9.5 3.5h5v2h-5z"/><path d="m8.5 12.5 2 2 4-4.5M8.5 17h6"/>',
+    pruefbefund:'<path d="M6 3h9l4 4v14H6zM15 3v5h4M9 12.5l2 2 4.5-5M9 17.5h6"/>',
+    bsb:'<path d="M12 3 4.5 6v5.2c0 4.6 3.1 8.4 7.5 9.8 4.4-1.4 7.5-5.2 7.5-9.8V6L12 3Z"/><path d="M9.5 12.5 11.3 14.3 15 10"/>',
     emails:'<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/>',
     knowledge:'<path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H11v15H7.5A3.5 3.5 0 0 0 4 20.5v-15ZM20 5.5A3.5 3.5 0 0 0 16.5 4H13v15h3.5a3.5 3.5 0 0 1 3.5 1.5v-15Z"/>',
     wiki:'<path d="M5 4h10l4 4v12H5zM15 4v5h4M8 13h8M8 17h6"/>',
@@ -4546,7 +4550,7 @@ function renderAll(){
   }
   navHtml();
   renderUserControl();
-  const workspacePages=(typeof orders==='function'?orders():'')+(typeof intelligence==='function'?intelligence():'')+(typeof knowledge==='function'?knowledge():'')+(typeof billing==='function'?billing():'')+(typeof compliance==='function'?compliance():'')+(typeof emails==='function'?emails():'');
+  const workspacePages=(typeof orders==='function'?orders():'')+(typeof intelligence==='function'?intelligence():'')+(typeof knowledge==='function'?knowledge():'')+(typeof billing==='function'?billing():'')+(typeof compliance==='function'?compliance():'')+(typeof pruefbefund==='function'?pruefbefund():'')+(typeof bsb==='function'?bsb():'')+(typeof emails==='function'?emails():'');
   document.getElementById('pages').innerHTML=dashboard()+workspacePages+calendarPage()+chatsPage()+master()+inspection()+findings()+measures()+reports()+documents()+customer()+userProfilesPage()+testProfilesPage()+settings();
   renderDashboardCalendarPreview();
   renderDashboardGreeting();
@@ -7761,7 +7765,7 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
     const search=header.querySelector('.search');
     if(search&&!search.querySelector('input')){
       search.classList.add('workspace-search');
-      search.innerHTML='<label class="sr-only" for="workspaceGlobalSearch">Globale Suche</label><span aria-hidden="true">⌕</span><input id="workspaceGlobalSearch" type="search" role="combobox" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="workspaceSearchResults" aria-activedescendant="" placeholder="Auftrag, Kunde, Objekt, Bericht oder Dokument suchen" onfocus="workspaceSearchInput(this.value,false,true)" oninput="workspaceSearchInput(this.value)" onkeydown="workspaceSearchKeydown(event)">';
+      search.innerHTML='<label class="sr-only" for="workspaceGlobalSearch">Globale Suche</label><span aria-hidden="true">⌕</span><input id="workspaceGlobalSearch" type="search" role="combobox" autocomplete="off" aria-autocomplete="list" aria-expanded="false" aria-controls="workspaceSearchResults" aria-activedescendant="" placeholder="Alles durchsuchen: Auftrag, Kunde, Standort, Gebäude, Feststellung, Maßnahme, Prüfung, Dokument …" onfocus="workspaceSearchInput(this.value,false,true)" oninput="workspaceSearchInput(this.value)" onkeydown="workspaceSearchKeydown(event)">';
     }
     if(!header.querySelector('#workspaceMobileSearch')){
       const mobileSearch=document.createElement('button');
@@ -7981,24 +7985,75 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
 
   let workspaceSearchResultsCache=[];
   let workspaceSearchActiveIndex=-1;
+  function searchMatch(normalized,...fields){
+    return fields.filter(Boolean).join(' ').toLocaleLowerCase('de-AT').includes(normalized);
+  }
+  /* Allgemeine Suche über sämtliche bekannten Datenbestände der Anwendung -
+     unabhängig davon, welche Art von Objekt gesucht wird (Auftrag, Kunde,
+     Standort, Gebäude, Objekt, Feststellung, Maßnahme, Prüfung, Dokument,
+     Prüfpflicht, Prüfbefund oder einfach ein Fachbereich/Seite). Neue
+     Fachdatenbestände sollten hier ergänzt werden, statt eine eigene,
+     engere Sucheingabe pro Modul zu bauen. */
   function searchEntries(query){
     const normalized=text(query).toLocaleLowerCase('de-AT');
     if(!normalized)return [];
     const results=[];
     arr(state.orders).forEach(order=>{
-      const haystack=[order.id,order.number,order.customerName,order.title,order.reference,order.notes].join(' ').toLocaleLowerCase('de-AT');
-      if(haystack.includes(normalized))results.push({kind:'order',id:order.id,page:'orders',title:[order.number,order.title||order.customerName].filter(Boolean).join(' · '),subtitle:'Auftrag · '+(order.customerName||'ohne Auftraggeber')});
+      if(searchMatch(normalized,order.id,order.number,order.customerName,order.title,order.reference,order.notes))
+        results.push({kind:'order',id:order.id,page:'orders',title:[order.number,order.title||order.customerName].filter(Boolean).join(' · '),subtitle:'Auftrag · '+(order.customerName||'ohne Auftraggeber')});
     });
     allProjects().forEach(project=>{
-      const haystack=[project.name,project.client,project.address,project.id,project.reference,project.articleNumber,project.contact].join(' ').toLocaleLowerCase('de-AT');
-      if(haystack.includes(normalized))results.push({kind:'project',id:project.id,orderId:project.orderId||'',page:'master',title:project.name||project.id,subtitle:(project.client||'Kunde')+' · Objekt'});
+      if(searchMatch(normalized,project.name,project.client,project.address,project.id,project.reference,project.articleNumber,project.contact))
+        results.push({kind:'project',id:project.id,orderId:project.orderId||'',page:'master',title:project.name||project.id,subtitle:(project.client||'Kunde')+' · Objekt'});
+    });
+    const bsbObjects=arr(state.projects).filter(p=>p?.customerId&&Array.isArray(p.bsbFindings));
+    arr(state.customers).forEach(customer=>{
+      if(searchMatch(normalized,customer.name,customer.customerNumber,typeof customer.contact==='string'?customer.contact:customer.contact?.name,customer.email,customer.contact?.email)){
+        const hasBsbObjects=bsbObjects.some(o=>o.customerId===customer.id);
+        results.push({kind:'customer',id:customer.id,hasBsbObjects,title:customer.name,subtitle:'Kunde'+(hasBsbObjects?' · Brandschutz':'')});
+      }
+    });
+    bsbObjects.forEach(object=>{
+      const customer=arr(state.customers).find(c=>c.id===object.customerId);
+      if(searchMatch(normalized,object.name,object.objectNumber,object.address))
+        results.push({kind:'bsbObject',id:object.id,customerId:object.customerId,title:object.name,subtitle:'Objekt (Brandschutz)'+(customer?' · '+customer.name:'')});
+      arr(object.bsbFindings).forEach(finding=>{
+        if(searchMatch(normalized,finding.findingNumber,finding.name,finding.description,finding.area,finding.locationText))
+          results.push({kind:'bsbObject',id:object.id,customerId:object.customerId,title:finding.name||finding.findingNumber,subtitle:'Mangel · '+object.name+(customer?' · '+customer.name:'')});
+      });
     });
     arr(state.documents).forEach(document=>{
-      const haystack=[document.name,document.id,document.type,document.version,document.projectId,document.inspectionId].join(' ').toLocaleLowerCase('de-AT');
-      if(haystack.includes(normalized))results.push({kind:'document',id:document.id||document.name,projectId:document.projectId||'',inspectionId:document.inspectionId||'',orderId:document.orderId||'',page:'documents',title:document.name||document.id,subtitle:(document.type||'Dokument')+(document.version?' · v'+document.version:'')});
+      if(searchMatch(normalized,document.name,document.id,document.type,document.version,document.projectId,document.inspectionId))
+        results.push({kind:'document',id:document.id||document.name,projectId:document.projectId||'',inspectionId:document.inspectionId||'',orderId:document.orderId||'',page:'documents',title:document.name||document.id,subtitle:(document.type||'Dokument')+(document.version?' · v'+document.version:'')});
     });
-    if('bericht freigabe qualitätssicherung'.includes(normalized)||normalized.includes('bericht'))results.push({kind:'page',id:'reports',page:'reports',title:'Bericht und Qualitätssicherung',subtitle:'Arbeitsbereich'});
-    return results.slice(0,8);
+    arr(state.findings).forEach(finding=>{
+      if(searchMatch(normalized,finding.id,finding.title,finding.description,finding.class))
+        results.push({kind:'finding',id:finding.id,page:'findings',title:finding.title||finding.id,subtitle:'Feststellung'+(finding.class?' · '+finding.class:'')});
+    });
+    arr(state.measures).forEach(measure=>{
+      if(searchMatch(normalized,measure.id,measure.title,measure.description,measure.action))
+        results.push({kind:'measure',id:measure.id,page:'measures',title:measure.title||measure.action||measure.id,subtitle:'Maßnahme'+(measure.priority?' · '+measure.priority:'')});
+    });
+    arr(state.inspections).forEach(inspection=>{
+      const project=allProjects().find(item=>item?.id===inspection.projectId);
+      if(searchMatch(normalized,inspection.id,inspection.profileCode,project?.name,project?.client))
+        results.push({kind:'inspection',id:inspection.id,projectId:inspection.projectId||'',orderId:inspection.orderId||'',page:'inspection',title:(project?.name||inspection.id),subtitle:'Prüfung'+(inspection.profileCode?' · '+inspection.profileCode:'')});
+    });
+    arr(state.complianceAssets).forEach(asset=>{
+      if(searchMatch(normalized,asset.id,asset.name,asset.manufacturer,asset.model,asset.site,asset.building))
+        results.push({kind:'complianceAsset',id:asset.id,page:'compliance',title:asset.name||asset.id,subtitle:'Prüfpflicht'+(asset.category?' · '+asset.category:'')});
+    });
+    arr(state.pbReports).forEach(report=>{
+      const asset=arr(state.pbFleet).find(item=>item.id===report.assetId);
+      if(searchMatch(normalized,report.id,asset?.name,asset?.customer,asset?.site))
+        results.push({kind:'pruefbefund',id:report.id,page:'pruefbefund',title:report.id+(asset?' · '+asset.name:''),subtitle:'Prüfbefund'});
+    });
+    (window.INGTECAppRegistry?.apps?.()||[]).forEach(app=>{
+      if(app.enabled===false)return;
+      if(searchMatch(normalized,app.name,app.description))
+        results.push({kind:'page',id:app.id,page:app.page,title:app.name,subtitle:'Fachbereich'});
+    });
+    return results.slice(0,10);
   }
   function closeWorkspaceSearch(){
     const input=document.getElementById('workspaceGlobalSearch');
@@ -8022,7 +8077,8 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
     let menu=document.getElementById('workspaceSearchResults');
     if(!menu){menu=document.createElement('div');menu.id='workspaceSearchResults';menu.className='workspace-search-results';menu.setAttribute('role','listbox');document.body.appendChild(menu);}
     if(!menu)return;
-    menu.innerHTML=results.length?results.map((result,index)=>'<button type="button" id="workspaceSearchOption'+index+'" role="option" aria-selected="'+(index===workspaceSearchActiveIndex)+'" data-search-index="'+index+'" onmouseenter="workspaceSearchSetActive('+index+')" onclick="workspaceOpenSearchResult('+index+')"><span class="workspace-search-kind" aria-hidden="true">'+esc(result.kind==='order'?'AU':result.kind==='project'?'OB':result.kind==='document'?'DO':'→')+'</span><span><b>'+esc(result.title)+'</b><small>'+esc(result.subtitle)+'</small></span></button>').join(''):'<div class="workspace-search-empty" role="status"><b>'+(text(query)?'Keine Treffer gefunden':'Globale Suche')+'</b><span>'+(text(query)?'Versuche eine Auftragsnummer, einen Kunden, ein Objekt oder einen Dokumentnamen.':'Suchbegriff eingeben oder mit Strg/⌘ + K jederzeit hierher springen.')+'</span></div>';
+    const searchKindGlyph={order:'AU',project:'OB',document:'DO',customer:'KU',bsbObject:'BS',finding:'FE',measure:'MA',inspection:'PR',complianceAsset:'PP',pruefbefund:'PB',page:'→'};
+    menu.innerHTML=results.length?results.map((result,index)=>'<button type="button" id="workspaceSearchOption'+index+'" role="option" aria-selected="'+(index===workspaceSearchActiveIndex)+'" data-search-index="'+index+'" onmouseenter="workspaceSearchSetActive('+index+')" onclick="workspaceOpenSearchResult('+index+')"><span class="workspace-search-kind" aria-hidden="true">'+esc(searchKindGlyph[result.kind]||'→')+'</span><span><b>'+esc(result.title)+'</b><small>'+esc(result.subtitle)+'</small></span></button>').join(''):'<div class="workspace-search-empty" role="status"><b>'+(text(query)?'Keine Treffer gefunden':'Globale Suche')+'</b><span>'+(text(query)?'Versuche einen Auftrag, Kunden, Standort, ein Gebäude, eine Feststellung, Maßnahme, Prüfung oder ein Dokument.':'Suchbegriff eingeben oder mit Strg/⌘ + K jederzeit hierher springen.')+'</span></div>';
     positionWorkspaceSearchMenu(menu);
     input?.setAttribute('aria-expanded','true');
     input?.setAttribute('aria-activedescendant',workspaceSearchActiveIndex>=0?'workspaceSearchOption'+workspaceSearchActiveIndex:'');
@@ -8034,7 +8090,7 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
     const results=searchEntries(value);
     workspaceSearchResultsCache=results;
     workspaceSearchActiveIndex=results.length?Math.min(Math.max(workspaceSearchActiveIndex,0),results.length-1):-1;
-    if(!results.length){renderWorkspaceSearchResults([],value);if(submit)window.showToast?.('Keine passenden Aufträge, Kunden, Objekte, Berichte oder Dokumente gefunden.');return;}
+    if(!results.length){renderWorkspaceSearchResults([],value);if(submit)window.showToast?.('Keine Treffer gefunden.');return;}
     if(submit){window.workspaceOpenSearchResult(workspaceSearchActiveIndex<0?0:workspaceSearchActiveIndex);return;}
     renderWorkspaceSearchResults(results);
   };
@@ -8081,6 +8137,39 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
       state.workspace.activeOrderId=result.orderId||project?.orderId||'';
       state.activeInspectionId=result.inspectionId||'';
       persist();window.renderAll();
+    }else if(result.kind==='inspection'){
+      const project=allProjects().find(item=>item?.id===result.projectId);
+      state.workspace.activeOrderId=result.orderId||project?.orderId||'';
+      state.activeInspectionId=result.id;
+      persist();window.renderAll();
+    }else if(result.kind==='customer'){
+      closeWorkspaceSearch();
+      const restoredInput=document.getElementById('workspaceGlobalSearch');
+      if(restoredInput)restoredInput.value='';else if(input)input.value='';
+      if(result.hasBsbObjects&&typeof window.bsbOpenContext==='function'){window.setPage('bsb');window.bsbOpenContext(result.id,'');}
+      else window.setPage('master');
+      return;
+    }else if(result.kind==='bsbObject'){
+      closeWorkspaceSearch();
+      const restoredInput=document.getElementById('workspaceGlobalSearch');
+      if(restoredInput)restoredInput.value='';else if(input)input.value='';
+      window.setPage('bsb');
+      window.bsbOpenContext?.(result.customerId,result.id);
+      return;
+    }else if(result.kind==='complianceAsset'){
+      closeWorkspaceSearch();
+      const restoredInput=document.getElementById('workspaceGlobalSearch');
+      if(restoredInput)restoredInput.value='';else if(input)input.value='';
+      window.setPage('compliance');
+      window.complianceSetScreen?.('assets');
+      return;
+    }else if(result.kind==='pruefbefund'){
+      closeWorkspaceSearch();
+      const restoredInput=document.getElementById('workspaceGlobalSearch');
+      if(restoredInput)restoredInput.value='';else if(input)input.value='';
+      window.setPage('pruefbefund');
+      window.pruefbefundSetScreen?.('list');
+      return;
     }
     closeWorkspaceSearch();
     const restoredInput=document.getElementById('workspaceGlobalSearch');
@@ -8298,8 +8387,8 @@ button.primary,button.secondary,.toolbar button,.quick-action-grid button,.row-a
 .app>aside #nav{gap:0}.app>aside #nav .nav-group:last-child{margin-bottom:0}
 .workspace-page-heading{min-width:150px}.workspace-page-heading h1{margin:0}.workspace-breadcrumb{margin:3px 0 0;color:var(--muted);font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .workspace-scope{width:auto;min-width:145px;margin:0;padding:9px 28px 9px 10px;font-size:12px}.workspace-search{position:relative;display:flex;align-items:center;gap:8px;min-width:320px}.workspace-search input{width:100%;margin:0;padding:0;border:0;background:transparent;outline:0}.workspace-mobile-search{display:none}.environment-badge{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:4px 8px;border:1px solid #c9d790;border-radius:999px;background:#eff6d8;color:#4c6208;font-size:10px;font-weight:900;letter-spacing:.08em}.header-environment{margin-left:2px}.workspace-notifications{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:44px;padding:10px!important}
-.workspace-search-results{position:fixed;z-index:1000;display:grid;gap:3px;max-height:360px;overflow:auto;padding:7px;border:1px solid var(--workspace-line);border-radius:14px;background:var(--white);box-shadow:0 16px 35px rgba(16,24,40,.18)}.workspace-search-results button{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 10px;border:0;border-radius:10px;background:transparent;color:var(--ink);text-align:left}.workspace-search-results button:hover,.workspace-search-results button:focus-visible,.workspace-search-results button[aria-selected="true"]{background:#f1f6e1}.workspace-search-results button>span:last-child{display:grid;min-width:0;gap:2px}.workspace-search-results b,.workspace-search-results small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.workspace-search-results small{color:var(--muted);font-size:11px}.workspace-search-kind{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#e8f0cf;color:#50670a;font-size:9px;font-weight:900;letter-spacing:.04em}.workspace-search-empty{display:grid;gap:4px;padding:14px 13px;color:var(--ink)}.workspace-search-empty b{font-size:13px}.workspace-search-empty span{color:var(--muted);font-size:11px;line-height:1.45}
-.workspace-account-menu{position:fixed;z-index:300;display:grid;min-width:250px;padding:7px;border:1px solid var(--workspace-line);border-radius:15px;background:var(--white);box-shadow:0 18px 42px rgba(16,24,40,.24)}.workspace-account-summary{display:grid;gap:3px;padding:10px 11px 12px;border-bottom:1px solid var(--workspace-line)}.workspace-account-summary small{color:var(--muted);font-size:11px}.workspace-account-menu button{min-height:42px;padding:10px;border:0;border-radius:9px;background:transparent;color:var(--ink);text-align:left;font-weight:700}.workspace-account-menu button:hover,.workspace-account-menu button:focus-visible{background:#f1f6e1}
+.workspace-search-results{position:fixed;z-index:2500;display:grid;gap:3px;max-height:360px;overflow:auto;padding:7px;border:1px solid var(--workspace-line);border-radius:14px;background:var(--white);box-shadow:0 16px 35px rgba(16,24,40,.18)}.workspace-search-results button{display:grid;grid-template-columns:34px minmax(0,1fr);align-items:center;gap:10px;width:100%;min-height:52px;padding:8px 10px;border:0;border-radius:10px;background:transparent;color:var(--ink);text-align:left}.workspace-search-results button:hover,.workspace-search-results button:focus-visible,.workspace-search-results button[aria-selected="true"]{background:#f1f6e1}.workspace-search-results button>span:last-child{display:grid;min-width:0;gap:2px}.workspace-search-results b,.workspace-search-results small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.workspace-search-results small{color:var(--muted);font-size:11px}.workspace-search-kind{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:#e8f0cf;color:#50670a;font-size:9px;font-weight:900;letter-spacing:.04em}.workspace-search-empty{display:grid;gap:4px;padding:14px 13px;color:var(--ink)}.workspace-search-empty b{font-size:13px}.workspace-search-empty span{color:var(--muted);font-size:11px;line-height:1.45}
+.workspace-account-menu{position:fixed;z-index:2500;display:grid;min-width:250px;padding:7px;border:1px solid var(--workspace-line);border-radius:15px;background:var(--white);box-shadow:0 18px 42px rgba(16,24,40,.24)}.workspace-account-summary{display:grid;gap:3px;padding:10px 11px 12px;border-bottom:1px solid var(--workspace-line)}.workspace-account-summary small{color:var(--muted);font-size:11px}.workspace-account-menu button{min-height:42px;padding:10px;border:0;border-radius:9px;background:transparent;color:var(--ink);text-align:left;font-weight:700}.workspace-account-menu button:hover,.workspace-account-menu button:focus-visible{background:#f1f6e1}
 #pages>#dashboard.dashboard-workspace{display:none!important}#pages>#dashboard.dashboard-workspace.active{display:grid!important;grid-template-columns:minmax(0,1fr);align-content:start;row-gap:26px;column-gap:0;padding-bottom:26px;isolation:isolate}#pages>#dashboard.dashboard-workspace.active>*{min-width:0;margin:0!important}.dashboard-workspace .card{position:relative;z-index:0}.workspace-dashboard-head,.active-order-card,.active-order-footer,.active-order-grid,.workspace-dashboard-grid,.dashboard-kpis,.quick-action-grid,.order-grid,.order-card-head,.order-card-meta,.order-process-strip{display:flex;gap:16px}.workspace-dashboard-head{align-items:flex-start;justify-content:space-between}.workspace-dashboard-head h2{margin:4px 0}.workspace-dashboard-head p{margin:0}.active-order-card{align-items:stretch;flex-direction:column;padding:20px}.active-order-title{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}.active-order-title h3{margin:4px 0;overflow-wrap:anywhere}.active-order-title p{margin:0;overflow-wrap:anywhere}.active-order-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.active-order-grid>div{display:grid;gap:3px;min-width:0;padding:12px;border:1px solid var(--workspace-line);border-radius:12px;background:var(--workspace-soft)}.active-order-grid small,.active-order-grid b,.active-order-grid span{overflow-wrap:anywhere}.active-order-grid small{color:var(--muted);font-size:10px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.active-order-grid b{font-size:13px}.active-order-grid span{color:var(--muted);font-size:11px;line-height:1.4}.active-order-footer{align-items:center;justify-content:space-between}.sync-inline{display:grid;gap:2px;color:#475467;font-size:11px}.sync-inline b{font-size:12px}.sync-inline.sync-offline b,.sync-inline.sync-conflict b,.sync-inline.sync-failed b{color:#b42318}.sync-inline.sync-pending b{color:#8a6100}.sync-inline.sync-local b{color:var(--ingtec-accessible-green)}
 .workspace-dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.9fr);align-items:stretch}.readiness-card{display:grid;gap:7px}.readiness-card h3{margin:0}.readiness-card p{margin:0}.workspace-blocker-list{display:grid;gap:8px;margin-top:6px}.workspace-blocker,.workspace-ready{display:flex;align-items:center;gap:9px;min-height:40px;padding:9px 10px;border:1px solid #d9e2b8;border-radius:10px;background:#fafcf4;color:#4d620d;text-align:left;font-size:12px;font-weight:700}.workspace-blocker{width:100%;cursor:pointer}.workspace-blocker:hover{background:#f0f6dc}.workspace-blocker span,.workspace-ready span{display:grid;place-items:center;flex:0 0 18px;width:18px;height:18px;border-radius:50%;background:#dfecc0;color:#3f5308;font-size:11px;font-style:normal}.workspace-blocker span{background:#ffe5dd;color:#a52419}
 .safety-score-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,.8fr);gap:16px;padding:20px;border:1px solid #d6e5a6;border-radius:var(--radius);background:linear-gradient(135deg,#fbfdf5,#f2f7df);box-shadow:var(--shadow)}.safety-score-card h3{margin:4px 0}.safety-score-card p{margin:5px 0 0;font-size:12px}.safety-score-value{display:block;margin-top:8px;color:#384b05;font-size:25px;line-height:1.1}.safety-score-meta{display:grid;align-content:start;gap:6px;padding:12px;border-radius:12px;background:rgba(255,255,255,.72)}.safety-score-meta b{font-size:12px}.safety-score-meta small{color:#52680b;font-size:11px;line-height:1.4}.safety-score-meta ul{display:grid;gap:4px;margin:5px 0 0;padding:0;list-style:none}.safety-score-meta li{display:flex;justify-content:space-between;gap:8px;color:#52680b;font-size:11px}.safety-score-card.is-pending{border-color:#dce2e7;background:#f8fafb}.safety-score-card.is-pending .safety-score-meta small{color:var(--muted)}
@@ -8528,6 +8617,10 @@ window.renderAll();
 <script src="INGTEC_Assets/billing-workspace.js?v=20260824-billing-v4"></script>
 <link rel="stylesheet" href="INGTEC_Assets/compliance-workspace.css?v=20260825-compliance-v3">
 <script src="INGTEC_Assets/compliance-workspace.js?v=20260825-compliance-v3"></script>
+<link rel="stylesheet" href="INGTEC_Assets/pruefbefund-workspace.css?v=20260827-pruefbefund-v1">
+<script src="INGTEC_Assets/pruefbefund-workspace.js?v=20260827-pruefbefund-v1"></script>
+<link rel="stylesheet" href="INGTEC_Assets/bsb-workspace.css?v=20260827-bsb-v1">
+<script src="INGTEC_Assets/bsb-workspace.js?v=20260827-bsb-v1"></script>
 <link rel="stylesheet" href="INGTEC_Assets/email-workspace.css?v=20260825-email-v1">
 <script src="INGTEC_Assets/email-workspace.js?v=20260825-email-v1"></script>
 <link rel="stylesheet" href="INGTEC_Assets/daily-workspace.css?v=20260810-daily-v2">

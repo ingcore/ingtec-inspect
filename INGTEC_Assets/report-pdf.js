@@ -119,7 +119,8 @@
       for(const row of rows){
         if(row?.title)paragraph(row.title,{size:10.5,font:'F2',color:'0.12 0.16 0.19',gap:1});
         for(const detail of Array.isArray(row?.details)?row.details:[]){
-          paragraph(detail,{size:9.5,color:'0.30 0.35 0.40',gap:1,limit:91});
+          const isRich=detail&&typeof detail==='object';
+          paragraph(isRich?detail.text:detail,{size:isRich&&detail.size||9.5,font:isRich&&detail.bold?'F2':'F1',color:(isRich&&detail.color)||'0.30 0.35 0.40',gap:1,limit:91});
         }
         y-=3;
       }

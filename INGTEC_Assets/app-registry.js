@@ -90,6 +90,21 @@
       ],legacyIds:['compliance','assets']
     },
     {
+      id:'pruefbefund',code:'APP-21',slug:'pruefbefund',name:'Prüfbefunde',
+      description:'Abnahme- und wiederkehrende Prüfungen nach AM-VO als rechtssicherer Einseitenbefund.',
+      icon:'pruefbefund',page:'pruefbefund',group:'work',navigation:[
+        {id:'liste',label:'Prüfbefunde',page:'pruefbefund',icon:'pruefbefund',path:'',screenAdapter:'pruefbefundSetScreen',screen:'list'},
+        {id:'neu',label:'Neuer Prüfbefund',page:'pruefbefund',icon:'pruefbefund',path:'neu',screenAdapter:'pruefbefundSetScreen',screen:'new'}
+      ],legacyIds:['pruefbefunde']
+    },
+    {
+      id:'bsb',code:'APP-22',slug:'bsb',name:'BSB',
+      description:'Brandschutzbegehung / Eigenkontrolle – UX-Prototyp für das Fachmeeting.',
+      icon:'bsb',page:'bsb',group:'work',navigation:[
+        {id:'start',label:'BSB',page:'bsb',icon:'bsb',path:'',screenAdapter:'bsbSetScreen',screen:'start'}
+      ],legacyIds:['bsb-begehung']
+    },
+    {
       id:'emails',code:'APP-15',slug:'emails',name:'E-Mails',
       description:'Lokales Postfach mit echtem Versand über dein Mailprogramm.',
       icon:'emails',page:'emails',group:'planning',navigation:[
@@ -250,7 +265,7 @@
       dashboard:'arbeitsplatz',orders:'auftraege',calendar:'termine',master:'kunden-objekte',
       inspection:'pruefungen',findings:'pruefungen',measures:'pruefungen',reports:'berichte',
       intelligence:'safety-score',knowledge:'wissen',chats:'teamarbeit',documents:'dokumente',
-      customer:'kundenportal',billing:'abrechnung',compliance:'pruefpflichten',emails:'emails',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
+      customer:'kundenportal',billing:'abrechnung',compliance:'pruefpflichten',pruefbefund:'pruefbefund',bsb:'bsb',emails:'emails',settings:'verwaltung',profiles:'verwaltung',testprofiles:'wissen'
     }[page];
     const chosen=candidates.find(candidate=>candidate.app.id===preferred)||candidates[0];
     return context(chosen.app,chosen.item.id);
@@ -298,6 +313,8 @@
       {name:'Bestehende Prüfungslinks werden in den App-Kontext überführt',passed:legacy?.app?.id==='pruefungen'},
       {name:'Abrechnung ist als eigene Fach-App aktiviert',passed:appFor('abrechnung')?.enabled!==false&&appFor('abrechnung')?.navigation?.[0]?.page==='billing'},
       {name:'Prüfpflichten ist als eigene Fach-App mit drei Bereichen aktiviert',passed:(()=>{const compliance=appFor('pruefpflichten');return compliance?.enabled!==false&&JSON.stringify(compliance?.navigation?.map(item=>item.id))===JSON.stringify(['portfolio','assets','due']);})()},
+      {name:'Prüfbefunde ist als eigene Fach-App mit Liste und Neuanlage aktiviert',passed:(()=>{const pb=appFor('pruefbefund');return pb?.enabled!==false&&JSON.stringify(pb?.navigation?.map(item=>item.id))===JSON.stringify(['liste','neu']);})()},
+      {name:'BSB ist als eigene Fach-App aktiviert',passed:(()=>{const bsb=appFor('bsb');return bsb?.enabled!==false&&bsb?.navigation?.[0]?.page==='bsb';})()},
       {name:'E-Mails ist als eigene Fach-App mit Posteingang und Gesendet aktiviert',passed:(()=>{const mail=appFor('emails');return mail?.enabled!==false&&JSON.stringify(mail?.navigation?.map(item=>item.id))===JSON.stringify(['inbox','sent']);})()},
       {name:'Weitere geplante Fachmodule bleiben registriert',passed:comingSoonApps().length>=3}
     ];
