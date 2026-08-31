@@ -303,26 +303,126 @@
   function bsbRender(){window.renderAll?.();setActivePage?.('bsb');hydratePhotoThumbnails();}
 
   /* ---------- Begehung ---------- */
+  function bsbCurrentActor(){
+    const account=typeof activeUserAccount==='function'?activeUserAccount():null;
+    return {id:account?.id||'LOCAL-DEMO',name:account?.name||state.user?.name||'Lokale Demo',role:account?.accessRole||state.user?.role||'Mitarbeiter*in'};
+  }
+  function bsbPermission(permission,label){
+    if(typeof window.requirePermission==='function'&&!window.requirePermission(permission,label))return false;
+    return true;
+  }
+  function bsbCanApprove(){
+    return Boolean(window.hasRolePermission?.('reportsRelease')||window.hasRolePermission?.('inspection'));
+  }
+  function bsbSyncQueueEntry(label,entityType,entityId,summary){
+    ensureBsbPersistenceState();
+    const entry={
+      id:'BSB-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+      at:now(),
+      entityType:text(entityType)||'BSB',
+      entityId:text(entityId)||'',
+      label:text(label)||'BSB-Änderung',
+      summary:text(summary||''),
+      source:'BSB',
+      status:'bereit zur Synchronisierung'
+    };
+    state.syncQueue.unshift(entry);
+    state.syncQueue=state.syncQueue.slice(0,200);
+    return entry;
+  }
+  window.bsbSyncNow=function(options={}){
+    const result=window.INGTECPlatform?.flushSyncQueue?.({source:'BSB',...options});
+    if(!result||typeof result.then==='function')return Promise.resolve(result||{ok:true,queued:0,flushed:0,mode:'empty'});
+    if(!result.ok){showToast?.(result.message||'Synchronisierung konnte nicht ausgeführt werden.',null,null,'error');}
+    return result;
+  };
+  function validateInspectionStart(object,prep){
+    const errors=[];
+    if(!object)return['Kein Objekt ausgewählt.'];
+    if(!text(prep?.date))errors.push('Ein Begehungsdatum ist erforderlich.');
+    if(!text(prep?.inspector))errors.push('Der Prüfender muss benannt werden.');
+    return errors;
+  }
+  function validateFindingDraft(input){
+    const required=[];
+    if(!text(input?.area))required.push('Bereich');
+    if(!text(input?.floor))required.push('Geschoß');
+    if(!text(input?.locationText))required.push('Standort / genaue Position');
+    if(!text(input?.category))required.push('Kategorie');
+    if(!text(input?.name))required.push('Mangelbezeichnung');
+    if(!text(input?.measure))required.push('Erforderliche Maßnahme');
+    return required;
+  }
+  function bsbCriticalFindingCount(object){
+    if(!object)return 0;
+    return arr(object.bsbFindings).filter(f=>['OPEN','STILL_OPEN'].includes(f.status)&&['hoch','kritisch'].includes(String(f.severity))).length;
+  }
+  function ensureBsbPersistenceState(){
+    state.auditEvents=Array.isArray(state.auditEvents)?state.auditEvents:[];
+    state.syncQueue=Array.isArray(state.syncQueue)?state.syncQueue:[];
+    state.bsbLifecycleVersion=state.bsbLifecycleVersion||'2026.08.31';
+    return true;
+  }
+  function validateInspectionCompletion(object,inspection){
+    const errors=[];
+    if(!object||!inspection)errors.push('Begehung oder Objekt nicht gefunden.');
+    if(!text(inspection?.date))errors.push('Das Begehungsdatum fehlt.');
+    if(!text(inspection?.inspector))errors.push('Der Prüfende fehlt.');
+    const pendingNew=arr(object?.bsbFindings).filter(f=>inspection?.newFindingIds.includes(f.id)&&['OPEN','STILL_OPEN'].includes(f.status));
+    if(pendingNew.length)errors.push(`${pendingNew.length} Mangel(e) sind noch offen und müssen vor Abschluss verarbeitet werden.`);
+    const critical=bsbCriticalFindingCount(object);
+    if(critical>0&&!window.hasRolePermission?.('reportsRelease'))errors.push(`Es bestehen ${critical} kritische bzw. hochgradige offene Mängel. Für die Freigabe ist eine entsprechende Berechtigung erforderlich.`);
+    if(!inspection?.newFindingIds.length&&!inspection?.recheckIds.length&&!text(inspection?.closingRemark))errors.push('Bitte eine allgemeine Bemerkung für die Begehung eintragen.');
+    return errors;
+  }
   function startInspection(object,prep){
     if(!window.requirePermission?.('inspection','das Starten einer Begehung'))return null;
+    const validationErrors=validateInspectionStart(object,prep||{});
+    if(validationErrors.length){showToast?.(validationErrors[0],null,null,'error');return null;}
+    const actorInfo=bsbCurrentActor();
     const inspection={id:nextInspectionId(),objectId:object.id,customerId:object.customerId,date:prep.date||viennaToday(),
-      inspector:prep.inspector||actor().name,participants:text(prep.participants),remark:text(prep.remark),
-      status:'IN_PROGRESS',newFindingIds:[],recheckIds:[],startedAt:now(),completedAt:'',closingRemark:''};
+      inspector:prep.inspector||actorInfo.name,participants:text(prep.participants),remark:text(prep.remark),
+      status:'IN_PROGRESS',newFindingIds:[],recheckIds:[],startedAt:now(),completedAt:'',closingRemark:'',
+      createdBy:actorInfo.name,createdByRole:actorInfo.role,updatedAt:now()};
     object.bsbInspections.unshift(inspection);
-    auditBsb('BSB-Begehung gestartet',`${object.name}`,inspection.id);
+    auditBsb('BSB-Begehung gestartet',`${object.name} · ${actorInfo.name} (${actorInfo.role})`,inspection.id);
     save?.();
     return inspection;
   }
   function finishInspection(object,inspection,closingRemark){
-    if(!window.requirePermission?.('inspection','das Abschließen einer Begehung'))return;
+    ensureBsbPersistenceState();
+    const hasReleasePrivilege=Boolean(window.hasRolePermission?.('reportsRelease'));
+    const actorInfo=bsbCurrentActor();
+    if(!bsbPermission('inspection','das Abschließen einer Begehung')&&!(hasReleasePrivilege&&bsbPermission('reportsRelease','die Freigabe einer Begehung'))){
+      return null;
+    }
+    const validationErrors=validateInspectionCompletion(object,inspection);
+    if(validationErrors.length){
+      showToast?.(validationErrors[0],null,null,'error');
+      return null;
+    }
+    if(bsbCriticalFindingCount(object)>0&&!hasReleasePrivilege){
+      showToast?.('Kritische Mängel erfordern eine Freigabeberechtigung.',null,null,'error');
+      return null;
+    }
     inspection.status='COMPLETED';
     inspection.completedAt=now();
     inspection.closingRemark=text(closingRemark);
+    inspection.finalizedBy=actorInfo.name;
+    inspection.finalizedByRole=actorInfo.role;
+    inspection.updatedAt=now();
+    inspection.releaseApproved=hasReleasePrivilege;
+    inspection.releaseState=hasReleasePrivilege?'RELEASED':'FINALIZED';
     const score=recalcObjectSafetyScore(object);
     inspection.safetyScoreSnapshot={...score};
     const report=createReportSnapshot(object,inspection);
     object.bsbReports.unshift(report);
-    auditBsb('BSB-Begehung abgeschlossen',`${object.name} · Safety-Score ${score.grade}`,inspection.id);
+    report.releaseApproved=hasReleasePrivilege;
+    report.releaseState=hasReleasePrivilege?'RELEASED':'FINALIZED';
+    report.finalizedBy=actorInfo.name;
+    report.finalizedByRole=actorInfo.role;
+    bsbSyncQueueEntry('BSB-Begehung finalisiert', 'BSB', inspection.id, `${object.name} · ${score.grade} · ${hasReleasePrivilege?'freigegeben':'finalisiert'}`);
+    auditBsb('BSB-Begehung abgeschlossen',`${object.name} · Safety-Score ${score.grade} · Freigegeben durch ${actorInfo.name} (${actorInfo.role})`,inspection.id);
     save?.();
     return report;
   }
@@ -343,6 +443,8 @@
   function createFinding(object,inspection,input){
     if(!window.requirePermission?.('inspection','das Erfassen eines Mangels'))return null;
     ensureConfig();
+    const required=validateFindingDraft(input);
+    if(required.length){showToast?.(`Bitte ergänzen: ${required.join(', ')}`,null,null,'error');return null;}
     const ruleset=ensureBsbScoreRuleset();
     const detectedAt=now();
     const finding={
@@ -365,6 +467,8 @@
   function updateFinding(object,finding,input){
     if(!window.requirePermission?.('inspection','das Bearbeiten eines Mangels'))return null;
     ensureConfig();
+    const required=validateFindingDraft(input);
+    if(required.length){showToast?.(`Bitte ergänzen: ${required.join(', ')}`,null,null,'error');return null;}
     const ruleset=ensureBsbScoreRuleset();
     Object.assign(finding,{
       area:input.area,floor:input.floor,locationText:text(input.locationText),category:input.category,
@@ -686,6 +790,22 @@
     if(object)crumbs.push({label:object.name,target:'objectDashboard',data:object.id});
     return `<nav class="bsb-breadcrumb" aria-label="Objektpfad">${crumbs.map((c,i)=>i===crumbs.length-1?`<span aria-current="page">${esc(c.label)}</span>`:`<button type="button" data-bsb-crumb="${c.target}" data-bsb-crumb-id="${esc(c.data||'')}">${esc(c.label)}</button>`).join('<i aria-hidden="true">›</i>')}</nav>`;
   }
+  function bsbBackTarget(){
+    const screen=view.screen;
+    if(screen==='start'||screen==='')return null;
+    if(screen==='objects'||screen==='allObjects')return {screen:'start'};
+    if(screen==='objectDashboard')return {screen:'objects',customerId:view.customerId||''};
+    if(screen==='prepare'||screen==='walk'||screen==='finish'||screen==='reportResult'||screen==='findings'||screen==='findingDetail'||screen==='findingsGlobal'){
+      if(view.objectId)return {screen:'objectDashboard',objectId:view.objectId,customerId:view.customerId||''};
+      if(view.customerId)return {screen:'objects',customerId:view.customerId};
+      return {screen:'start'};
+    }
+    if(screen==='archive')return {screen:'start'};
+    if(screen==='archiveInspectionDetail')return {screen:'archiveInspections'};
+    if(screen==='archiveFindingDetail')return {screen:'archiveFindings'};
+    if(screen==='archiveInspections'||screen==='archiveFindings')return {screen:'archive'};
+    return {screen:'start'};
+  }
 
   /* ---- Startseite ---- */
   function kpiCard(label,value,screen,extra){return `<button type="button" class="card bsb-kpi-card" data-bsb-kpi="${screen}" data-bsb-kpi-extra="${extra||''}"><small>${esc(label)}</small><strong>${value}</strong></button>`;}
@@ -918,6 +1038,7 @@
     const {object,inspection}=findInspection(inspectionId);
     const remark=document.getElementById('bsbClosingRemark')?.value||'';
     const report=finishInspection(object,inspection,remark);
+    if(!report)return;
     navigate({screen:'reportResult',objectId:object.id,inspectionId:inspection.id,reportId:report.id});
   };
 
@@ -954,16 +1075,53 @@
     const object=objectById(view.objectId);
     const report=object.bsbReports.find(r=>r.id===view.reportId);
     if(!report)return '<p class="bsb-empty">Bericht nicht gefunden.</p>';
+    const releaseLabel=report.releaseApproved?'FREIGEGEBEN':'FINALISIERT';
     return `<div class="bsb-overview bsb-result-screen">
       <h2>Begehung abgeschlossen</h2>
       <p>${dateLabel(report.date)}<br>${esc(object.name)}</p>
       ${safetyScoreCard(report.safetyScoreSnapshot)}
+      <p><span class="eyebrow">Freigabe-Status</span><br><strong>${releaseLabel}</strong>${report.finalizedBy?` · ${esc(report.finalizedBy)}`:''}</p>
       <div class="bsb-result-actions">
         <button type="button" class="primary" data-bsb-download-report="${esc(object.id)}::${esc(report.id)}">PDF HERUNTERLADEN</button>
+        <button type="button" class="secondary" data-bsb-export-report="${esc(object.id)}::${esc(report.id)}">JSON EXPORT</button>
         <button type="button" class="secondary" data-bsb-nav="objectDashboard">ZUM OBJEKT</button>
       </div>
+      ${report?.createdBy?`<p class="eyebrow">Freigabe</p><p>${esc(report.createdBy)} · ${dateTimeLabel(report.createdAt)}</p>`:''}
     </div>`;
   }
+  window.bsbExportReportJson=function(objectId,reportId){
+    const object=objectById(objectId);
+    const report=object?.bsbReports.find(r=>r.id===reportId);
+    if(!object||!report){showToast?.('Bericht nicht gefunden.',null,null,'error');return;}
+    const payload={
+      exportType:'BSB-Begehungsbericht',
+      exportedAt:now(),
+      objectId:object.id,
+      customerId:object.customerId,
+      objectName:object.name,
+      reportId:report.id,
+      date:report.date,
+      createdAt:report.createdAt,
+      createdBy:report.createdBy,
+      releaseApproved:Boolean(report.releaseApproved),
+      releaseState:report.releaseState||'FINALIZED',
+      findings:[...report.newFindingsSnapshot,...report.recheckedFindingsSnapshot],
+      safetyScoreSnapshot:report.safetyScoreSnapshot,
+      closingRemark:report.closingRemark||''
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=`BSB_Bericht_${object.name}_${report.date}.json`.replace(/[^A-Za-z0-9._-]+/g,'_');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),0);
+    bsbSyncQueueEntry('BSB-Bericht exportiert', 'BSB', report.id, `${object.name} · JSON Export`);
+    save?.();
+    showToast?.('Bericht als JSON exportiert.');
+  };
   /* ---- Objektarchiv: read-only, ausschließlich object_id-scoped ---- */
   function recheckOutcomeCounts(object,inspection){
     let resolved=0,stillOpen=0;
@@ -1019,6 +1177,7 @@
         <div><span>Nachkontrolliert</span><b>${rechecked.length}</b></div>
       </div>
       ${inspection.safetyScoreSnapshot?safetyScoreCard(inspection.safetyScoreSnapshot):''}
+      ${inspection.finalizedBy?`<p><span class="eyebrow">Freigegeben durch</span><br>${esc(inspection.finalizedBy)}${inspection.finalizedByRole?` · ${esc(inspection.finalizedByRole)}`:''}</p>`:''}
       ${inspection.closingRemark?`<p><span class="eyebrow">Allgemeine Bemerkung</span><br>${esc(inspection.closingRemark)}</p>`:''}
       ${newFindings.length?`<h3>Neue Mängel</h3><div class="bsb-finding-list">${newFindings.map(f=>findingRow(f)).join('')}</div>`:''}
       ${rechecked.length?`<h3>Nachkontrollierte Mängel</h3><div class="bsb-finding-list">${rechecked.map(f=>findingRow(f)).join('')}</div>`:''}
@@ -1080,6 +1239,7 @@
   }
   function ensure(){
     ensureConfig();
+    ensureBsbPersistenceState();
     ensureBsbScoreRuleset();
     if(!state.bsbSeededV3){seedDemoData();state.bsbSeededV3=true;}
     arr(state.projects).forEach(p=>{if(p.customerId)ensureObjectShape(p);});
@@ -1106,7 +1266,9 @@
     else if(view.screen==='archiveFindings')body=archiveFindingsScreen();
     else if(view.screen==='archiveFindingDetail')body=archiveFindingDetailScreen();
     else body=startScreen();
-    return `<section class="page bsb-workspace" id="bsb"><div class="section-head bsb-page-head"><div><span class="eyebrow">BSB</span><h2>Brandschutzbegehungen</h2></div></div>${contextHeader()}${body}</section>`;
+    const back=bsbBackTarget();
+    const backButton=back?`<button type="button" class="bsb-back-button" data-bsb-nav="${esc(back.screen)}" data-bsb-nav-object="${esc(back.objectId||'')}" data-bsb-nav-customer="${esc(back.customerId||'')}" aria-label="Zurück">←</button>`:'';
+    return `<section class="page bsb-workspace" id="bsb"><div class="section-head bsb-page-head"><div><span class="eyebrow">BSB</span><h2>Brandschutzbegehungen</h2></div>${backButton}</div>${contextHeader()}${body}</section>`;
   }
   window.bsb=page;
   window.bsbSetScreen=setBsbScreen;
@@ -1155,6 +1317,8 @@
     if(finishInspectionBtn){event.preventDefault();window.bsbFinishInspection(finishInspectionBtn.dataset.bsbFinishInspection);return;}
     const downloadReport=target.closest('[data-bsb-download-report]');
     if(downloadReport){event.preventDefault();const [objectId,reportId]=downloadReport.dataset.bsbDownloadReport.split('::');window.bsbDownloadReport(objectId,reportId);return;}
+    const exportReport=target.closest('[data-bsb-export-report]');
+    if(exportReport){event.preventDefault();const [objectId,reportId]=exportReport.dataset.bsbExportReport.split('::');window.bsbExportReportJson(objectId,reportId);return;}
   });
   document.addEventListener('change',event=>{
     const areaFilter=event.target.closest?.('[data-bsb-findings-area]');

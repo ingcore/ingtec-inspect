@@ -336,6 +336,30 @@
     return {passed:tests.every(test=>test.passed),tests,runAt:now()};
   }
 
+  async function flushSyncQueue(options={}){
+    const queue=Array.isArray(state?.syncQueue)?state.syncQueue:[];
+    if(!queue.length)return {ok:true,queued:0,flushed:0,mode:'empty'};
+    const endpoint=text(options.endpoint||state?.syncApiEndpoint||'');
+    const token=text(options.token||state?.syncToken||'');
+    const payload=clone(queue).map(item=>({...item,source:item.source||options.source||'platform'}));
+    if(!endpoint){
+      state.syncQueue=queue.map(entry=>({...entry,status:entry.status==='synchronisiert'?'lokal gespeichert':entry.status||'lokal gespeichert'}));
+      return {ok:true,queued:queue.length,flushed:0,mode:'local',message:'Kein API-Endpunkt konfiguriert; Queue bleibt lokal sichtbar.'};
+    }
+    if(typeof fetch!=='function')return {ok:false,queued:queue.length,flushed:0,mode:'unsupported',message:'Fetch API nicht verfügbar.'};
+    try{
+      const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{}),...(options.headers||{})},body:JSON.stringify({events:payload,source:options.source||'platform',savedAt:now()})});
+      const body=await response.json().catch(()=>({}));
+      if(!response.ok){throw new Error(body?.message||'HTTP '+response.status);}
+      state.syncQueue=[];
+      state.lastSyncAt=now();
+      return {ok:true,queued:queue.length,flushed:queue.length,mode:'api',response:body};
+    }catch(error){
+      state.syncQueue=queue.map(entry=>({...entry,status:entry.status==='bereit zur Synchronisierung'?'wartet auf Synchronisierung':entry.status||'wartet auf Synchronisierung'}));
+      return {ok:false,queued:queue.length,flushed:0,mode:'api',message:error.message};
+    }
+  }
+
   function runAllTests(){
     const suites=[
       ['Plattform',window.__INGTEC_PLATFORM_TESTS__],
@@ -364,7 +388,7 @@
   applyMeasureReadModelCompatibility();
   const originalSave=typeof window.save==='function'?window.save:null;
   window.save=safeSave;
-  window.INGTECPlatform={VERSION,SCHEMA_VERSION,validateState,repairState,safeSave,restoreBackup,exportBackup,validateFile,storeLocalFile,getLocalFile,safeUrl,transitionAllowed,runtimeReport,showDiagnostics,measureView:v4MeasureView,applyMeasureReadModelCompatibility,originalSave};
+  window.INGTECPlatform={VERSION,SCHEMA_VERSION,validateState,repairState,safeSave,restoreBackup,exportBackup,validateFile,storeLocalFile,getLocalFile,safeUrl,transitionAllowed,runtimeReport,showDiagnostics,flushSyncQueue,measureView:v4MeasureView,applyMeasureReadModelCompatibility,originalSave};
   document.addEventListener('change',event=>{
     const input=event.target;
     if(!(input instanceof HTMLInputElement)||input.type!=='file'||!input.files?.length)return;
