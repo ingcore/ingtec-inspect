@@ -56,15 +56,19 @@
     return color+' RG\n1.4 w\n'+number(PAGE.left)+' '+number(y)+' m\n'+number(PAGE.right)+' '+number(y)+' l\nS\n';
   }
 
-  function buildDocument(model){
+  function buildDocument(model,images=[]){
     const source=model&&typeof model==='object'?model:{};
     const pages=[];
+    const pageImageIndexes=[];
     let commands=[];
     let y=PAGE.top;
+    let pageIndex=-1;
 
     function startPage(){
       commands=[];
       pages.push(commands);
+      pageImageIndexes.push([]);
+      pageIndex=pages.length-1;
       y=PAGE.top;
       if(pages.length>1){
         commands.push(textCommand({x:PAGE.left,y,font:'F2',size:8.5,text:source.runningTitle||source.title||'INGTEC Bericht',color:'0.31 0.39 0.03'}));
@@ -126,6 +130,25 @@
       }
     }
 
+    if(images.length){
+      heading('Fotodokumentation');
+      images.forEach((image,index)=>{
+        const width=Math.max(1,Number(image.width)||1);
+        const height=Math.max(1,Number(image.height)||1);
+        const maxWidth=PAGE.right-PAGE.left;
+        const maxHeight=260;
+        const scale=Math.min(maxWidth/width,maxHeight/height,1);
+        const renderedWidth=width*scale;
+        const renderedHeight=height*scale;
+        if(image.caption)paragraph(image.caption,{size:9,font:'F2',color:'0.24 0.29 0.34',gap:2,limit:88});
+        reserve(renderedHeight+12);
+        y-=renderedHeight;
+        commands.push('q\n'+number(renderedWidth)+' 0 0 '+number(renderedHeight)+' '+number(PAGE.left)+' '+number(y)+' cm\n/Im'+index+' Do\nQ\n');
+        pageImageIndexes[pageIndex].push(index);
+        y-=12;
+      });
+    }
+
     if(source.footer){
       y-=4;
       paragraph(source.footer,{size:8.5,color:'0.38 0.43 0.48',gap:1,limit:94});
@@ -135,12 +158,14 @@
       page.push(ruleCommand(39,'0.85 0.88 0.78'));
       page.push(textCommand({x:PAGE.left,y:26,size:8,font:'F1',text:'INGTEC Inspect · Seite '+(index+1)+' von '+pages.length,color:'0.42 0.46 0.50'}));
     });
-    return pages.map(page=>page.join(''));
+    return {streams:pages.map(page=>page.join('')),pageImageIndexes};
   }
 
-  function buildPdf(streams){
+  function buildPdf(streams,images=[],pageImageIndexes=[]){
     const pageCount=Math.max(1,streams.length);
-    const pageRefs=Array.from({length:pageCount},(_,index)=>5+index*2);
+    const imageRefs=images.map((_,index)=>5+index);
+    const pageStart=5+images.length;
+    const pageRefs=Array.from({length:pageCount},(_,index)=>pageStart+index*2);
     const objects=[
       '<< /Type /Catalog /Pages 2 0 R >>',
       '<< /Type /Pages /Kids ['+pageRefs.map(ref=>ref+' 0 R').join(' ')+'] /Count '+pageCount+' >>',
@@ -148,10 +173,17 @@
       '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>'
     ];
 
+    images.forEach(image=>{
+      const hex=String(image.hex||'');
+      objects.push('<< /Type /XObject /Subtype /Image /Width '+Math.max(1,Math.round(Number(image.width)||1))+' /Height '+Math.max(1,Math.round(Number(image.height)||1))+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length '+(hex.length+2)+' >>\nstream\n'+hex+'>\nendstream');
+    });
+
     streams.forEach((stream,index)=>{
       const pageRef=pageRefs[index];
       const contentRef=pageRef+1;
-      objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '+contentRef+' 0 R >>');
+      const refs=(pageImageIndexes[index]||[]).map(imageIndex=>'/Im'+imageIndex+' '+imageRefs[imageIndex]+' 0 R').join(' ');
+      const xObjects=refs?' /XObject << '+refs+' >>':'';
+      objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >>'+xObjects+' >> /Contents '+contentRef+' 0 R >>');
       objects.push('<< /Length '+stream.length+' >>\nstream\n'+stream+'endstream');
     });
 
@@ -169,7 +201,47 @@
   }
 
   function create(model){
-    const pdf=buildPdf(buildDocument(model));
+    const documentModel=buildDocument(model);
+    const pdf=buildPdf(documentModel.streams,[],documentModel.pageImageIndexes);
+    return new Blob([pdf],{type:'application/pdf'});
+  }
+
+  function imageSpec(entry){
+    return new Promise((resolve,reject)=>{
+      const source=clean(entry?.dataUrl||'');
+      if(!source.startsWith('data:image/')){resolve(null);return;}
+      const image=new Image();
+      image.onload=()=>{
+        try{
+          const naturalWidth=Math.max(1,image.naturalWidth||image.width||1);
+          const naturalHeight=Math.max(1,image.naturalHeight||image.height||1);
+          const maxEdge=1100;
+          const scale=Math.min(1,maxEdge/Math.max(naturalWidth,naturalHeight));
+          const width=Math.max(1,Math.round(naturalWidth*scale));
+          const height=Math.max(1,Math.round(naturalHeight*scale));
+          const canvas=document.createElement('canvas');
+          canvas.width=width;canvas.height=height;
+          const context=canvas.getContext('2d',{alpha:false});
+          context.fillStyle='#ffffff';context.fillRect(0,0,width,height);
+          context.drawImage(image,0,0,width,height);
+          const dataUrl=canvas.toDataURL('image/jpeg',0.76);
+          const binary=atob(dataUrl.slice(dataUrl.indexOf(',')+1));
+          let hex='';
+          for(let index=0;index<binary.length;index++)hex+=binary.charCodeAt(index).toString(16).padStart(2,'0').toUpperCase();
+          resolve({width,height,hex,caption:clean(entry?.caption)});
+        }catch(error){reject(error);}
+      };
+      image.onerror=()=>reject(new Error('Bild kann nicht als PDF-Foto verarbeitet werden.'));
+      image.src=source;
+    });
+  }
+
+  async function createWithImages(model){
+    const source=model&&typeof model==='object'?model:{};
+    const entries=(Array.isArray(source.images)?source.images:[]).slice(0,24);
+    const images=(await Promise.all(entries.map(entry=>imageSpec(entry).catch(()=>null)))).filter(Boolean);
+    const documentModel=buildDocument(source,images);
+    const pdf=buildPdf(documentModel.streams,images,documentModel.pageImageIndexes);
     return new Blob([pdf],{type:'application/pdf'});
   }
 
@@ -187,5 +259,19 @@
     return blob;
   }
 
-  window.INGTECPdf=Object.freeze({create,download});
+  async function downloadWithImages(model,filename){
+    const blob=await createWithImages(model);
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement('a');
+    link.href=url;
+    link.download=(clean(filename)||'INGTEC_Bericht')+'.pdf';
+    link.style.display='none';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+    return blob;
+  }
+
+  window.INGTECPdf=Object.freeze({create,download,createWithImages,downloadWithImages});
 })();

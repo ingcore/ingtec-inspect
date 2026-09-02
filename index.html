@@ -5682,6 +5682,7 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
   }
   window.renderAll=function(){
     ensurePrdPrototypeData();
+    (Array.isArray(state.measures)?state.measures:[]).forEach(measure=>{if(!Array.isArray(measure.evidenceIds))measure.evidenceIds=[];});
     const result=legacyRenderAll.apply(this,arguments);
     postRenderPrdAlignment();
     return result;
@@ -8269,7 +8270,7 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
       {name:'Keine sichtbare verbotene Auftragsbezeichnung',passed:!/(Prüfauftrag|Pruefauftrag)/i.test(textNodes)},
       {name:'Dashboard zeigt SafetyScore höchstens einmal im passenden Arbeitsmodus',passed:(()=>{const cards=document.querySelectorAll('#dashboard .safety-score-card,#dashboard .daily-mode-card.mode-darkblue');return cards.length<=1&&(cards.length===1||Boolean(document.querySelector('#dashboard.daily-workspace .daily-active')));})()},
       {name:'Navigation enthält Chats und Profile',passed:nav.some(item=>item[0]==='chats'&&item[1]==='Chats')&&nav.some(item=>item[0]==='profiles'&&item[1]==='Profile')},
-      {name:'Navigation folgt der vereinbarten Bereichsstruktur',passed:JSON.stringify(nav.map(item=>[item[1],item[3]]))===JSON.stringify([['Übersicht','Verwaltung'],['Aufträge','Verwaltung'],['Termine','Verwaltung'],['Chats','Verwaltung'],['E-Mails','Verwaltung'],['Kunden / Objekte','Prüfungen-Business'],['Prüfungen','Prüfungen-Business'],['Befundungen','Prüfungen-Business'],['Maßnahmen','Prüfungen-Business'],['Berichte','Prüfungen-Business'],['Prüfpflichten','Prüfungen-Business'],['Abrechnung','Verwaltung'],['Wissen','Wissen'],['Wiki','Wissen'],['Profile','Administration'],['Einstellungen','Administration']])},
+      {name:'Navigation folgt der vereinbarten Bereichsstruktur',passed:JSON.stringify(nav.map(item=>[item[1],item[3]]))===JSON.stringify([['Übersicht','Verwaltung'],['Aufträge','Verwaltung'],['Termine','Verwaltung'],['Chats','Verwaltung'],['E-Mails','Verwaltung'],['Kunden / Objekte','Prüfungen-Business'],['Prüfungen','Prüfungen-Business'],['Befundungen','Prüfungen-Business'],['Maßnahmen','Prüfungen-Business'],['Berichte','Prüfungen-Business'],['Prüfpflichten','Prüfungen-Business'],['Prüfbefunde','Prüfungen-Business'],['BSB','Prüfungen-Business'],['Abrechnung','Verwaltung'],['Wissen','Wissen'],['Wiki','Wissen'],['Profile','Administration'],['Einstellungen','Administration']])},
       {name:'Eingeklappte Navigation enthält Symbole für alle Einträge',passed:(()=>{const rendered=document.querySelectorAll('#nav button .nav-symbol svg').length,appNavigation=window.INGTECAppShell?.visibleNavigation?.();return rendered===(Array.isArray(appNavigation)?appNavigation.length:nav.length);})()},
       {name:'Die Übersichtsseite ist außerhalb von Übersicht ausgeblendet',passed:(()=>{const probe=document.createElement('section');probe.id='dashboard';probe.className='page dashboard-workspace';document.getElementById('pages')?.appendChild(probe);const hidden=getComputedStyle(probe).display==='none';probe.remove();return hidden;})()}
     ];
@@ -8363,6 +8364,9 @@ nav button .chat-nav-unread-badge{display:inline-flex!important;align-items:cent
 
   ensureWorkspaceData();
   ensureSafetyScore();
+  // Die erste Shell-Ansicht rendert noch vor dem Plattform-Kompatibilitätslayer.
+  // Legacy-Renderer erwarten die Liste bereits hier; V4 ersetzt sie danach wieder durch seine Projektion.
+  (Array.isArray(state.measures)?state.measures:[]).forEach(measure=>{if(!Array.isArray(measure.evidenceIds))measure.evidenceIds=[];});
   window.renderAll();
 })();
 </script>
@@ -8619,17 +8623,17 @@ window.renderAll();
 <script src="INGTEC_Assets/compliance-workspace.js?v=20260825-compliance-v3"></script>
 <link rel="stylesheet" href="INGTEC_Assets/pruefbefund-workspace.css?v=20260827-pruefbefund-v1">
 <script src="INGTEC_Assets/pruefbefund-workspace.js?v=20260827-pruefbefund-v1"></script>
-<link rel="stylesheet" href="INGTEC_Assets/bsb-workspace.css?v=20260827-bsb-v1">
-<script src="INGTEC_Assets/bsb-workspace.js?v=20260827-bsb-v1"></script>
+<link rel="stylesheet" href="INGTEC_Assets/bsb-workspace.css?v=20260901-bsb-v6">
+<script src="INGTEC_Assets/bsb-workspace.js?v=20260901-bsb-v6"></script>
 <link rel="stylesheet" href="INGTEC_Assets/email-workspace.css?v=20260825-email-v1">
 <script src="INGTEC_Assets/email-workspace.js?v=20260825-email-v1"></script>
 <link rel="stylesheet" href="INGTEC_Assets/daily-workspace.css?v=20260810-daily-v2">
 <script src="INGTEC_Assets/daily-workspace.js?v=20260807-daily-v1"></script>
   <link rel="stylesheet" href="INGTEC_Assets/app-platform.css?v=20260810-platform-v2">
-  <script src="INGTEC_Assets/app-platform.js?v=20260824-platform-v4"></script>
+  <script src="INGTEC_Assets/app-platform.js?v=20260901-platform-v7"></script>
   <link rel="stylesheet" href="INGTEC_Assets/app-shell.css?v=20260817-app-shell-v2">
-  <script src="INGTEC_Assets/app-registry.js?v=20260825-app-registry-v4"></script>
-  <script src="INGTEC_Assets/app-shell.js?v=20260825-app-shell-v4"></script>
+  <script src="INGTEC_Assets/app-registry.js?v=20260901-app-registry-v5"></script>
+  <script src="INGTEC_Assets/app-shell.js?v=20260901-app-shell-v5"></script>
   <link rel="stylesheet" href="INGTEC_Assets/hub-launcher.css?v=20260817-individual-apps-v2">
 <style id="hub-drag-visual-fix">
 /* Beim Ziehen bleibt nur ein unaufdringlicher Platzhalter im Raster; die vollständige Kachel folgt dem Finger bzw. Mauszeiger. */
@@ -8638,5 +8642,5 @@ window.renderAll();
   <script src="INGTEC_Assets/hub-launcher.js?v=20260817-app-registry-v8"></script>
 <link rel="stylesheet" href="INGTEC_Assets/calendar-zoom-timeline.css">
 <script src="INGTEC_Assets/calendar-zoom-timeline.js"></script>
-<script src="INGTEC_Assets/report-pdf.js?v=20260818-report-pdf-v1"></script>
+<script src="INGTEC_Assets/report-pdf.js?v=20260901-report-pdf-v2"></script>
 </body></html>

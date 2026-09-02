@@ -249,7 +249,12 @@
     return true;
   }
   function applyMeasureReadModelCompatibility(){
-    asArray(currentState()?.measures).forEach(attachMeasureCompatibility);
+    asArray(currentState()?.measures).forEach(measure=>{
+      // Ältere Maßnahmen ohne Nachweisliste bleiben in allen Ansichten lesbar.
+      // V4 erhält weiterhin ausschließlich seine abgeleitete, nicht persistierte Projektion.
+      if(!v4MeasureView(measure)&&!Array.isArray(measure.evidenceIds))measure.evidenceIds=[];
+      attachMeasureCompatibility(measure);
+    });
   }
 
   function transitionAllowed(from,to){
@@ -339,8 +344,8 @@
   async function flushSyncQueue(options={}){
     const queue=Array.isArray(state?.syncQueue)?state.syncQueue:[];
     if(!queue.length)return {ok:true,queued:0,flushed:0,mode:'empty'};
-    const endpoint=text(options.endpoint||state?.syncApiEndpoint||'');
-    const token=text(options.token||state?.syncToken||'');
+    const endpoint=cleanText(options.endpoint||state?.syncApiEndpoint||'');
+    const token=cleanText(options.token||state?.syncToken||'');
     const payload=clone(queue).map(item=>({...item,source:item.source||options.source||'platform'}));
     if(!endpoint){
       state.syncQueue=queue.map(entry=>({...entry,status:entry.status==='synchronisiert'?'lokal gespeichert':entry.status||'lokal gespeichert'}));
@@ -372,11 +377,12 @@
       ['Prüfpflichten',window.__INGTEC_COMPLIANCE_TESTS__],
       ['E-Mails',window.__INGTEC_EMAIL_TESTS__],
       ['Hub',window.__INGTEC_HUB_TESTS__],
-      ['Zusammenarbeit',window.__INGTEC_COLLABORATION_TESTS__]
+      ['Zusammenarbeit',window.__INGTEC_COLLABORATION_TESTS__],
+      ['Brandschutzbegehung',window.__INGTEC_BSB_TESTS__]
     ];
     try{if(typeof window.runWorkspaceContractTests==='function')suites.push(['Vertrag',window.runWorkspaceContractTests()]);}catch(error){suites.push(['Vertrag',{passed:false,tests:[{name:error.message,passed:false}]}]);}
     const tests=suites.flatMap(([suite,result])=>asArray(result?.tests).map(test=>({suite,name:test.name,passed:Boolean(test.passed)})));
-    tests.push({suite:'Shell',name:'Alle Fach-Stylesheets geladen',passed:['inspection-workspace.css','finding-workspace.css','measure-workspace.css','billing-workspace.css','compliance-workspace.css','email-workspace.css','daily-workspace.css','collaboration-suite.css','app-platform.css','calendar-zoom-timeline.css'].every(name=>[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes(name)))});
+    tests.push({suite:'Shell',name:'Alle Fach-Stylesheets geladen',passed:['inspection-workspace.css','finding-workspace.css','measure-workspace.css','billing-workspace.css','compliance-workspace.css','bsb-workspace.css','email-workspace.css','daily-workspace.css','collaboration-suite.css','app-platform.css','calendar-zoom-timeline.css'].every(name=>[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes(name)))});
     tests.push({suite:'Shell',name:'Hub-Startauswahl vollständig geladen',passed:Boolean(window.INGTECHub)&&[...document.styleSheets].some(sheet=>cleanText(sheet.href).includes('hub-launcher.css'))});
     tests.push({suite:'Shell',name:'Manifest ist verknüpft',passed:Boolean(document.querySelector('link[rel="manifest"]'))});
     tests.push({suite:'Shell',name:'INGTEC-Hauptfarbe bleibt erhalten',passed:getComputedStyle(document.documentElement).getPropertyValue('--ing').trim().toUpperCase()==='#9DC31A'});

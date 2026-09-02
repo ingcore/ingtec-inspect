@@ -101,7 +101,10 @@
       id:'bsb',code:'APP-22',slug:'bsb',name:'BSB',
       description:'Brandschutzbegehung / Eigenkontrolle – UX-Prototyp für das Fachmeeting.',
       icon:'bsb',page:'bsb',group:'work',navigation:[
-        {id:'start',label:'BSB',page:'bsb',icon:'bsb',path:'',screenAdapter:'bsbSetScreen',screen:'start'}
+        {id:'today',label:'Heute',page:'bsb',icon:'dashboard',path:'',screenAdapter:'bsbSetScreen',screen:'start'},
+        {id:'objects',label:'Objekte',page:'bsb',icon:'objects',path:'objekte',screenAdapter:'bsbSetScreen',screen:'allObjects'},
+        {id:'findings',label:'Mängel',page:'bsb',icon:'findings',path:'maengel',screenAdapter:'bsbSetScreen',screen:'findingsGlobal'},
+        {id:'more',label:'Mehr',page:'bsb',icon:'settings',path:'mehr',screenAdapter:'bsbSetScreen',screen:'more'}
       ],legacyIds:['bsb-begehung']
     },
     {
@@ -314,7 +317,7 @@
       {name:'Abrechnung ist als eigene Fach-App aktiviert',passed:appFor('abrechnung')?.enabled!==false&&appFor('abrechnung')?.navigation?.[0]?.page==='billing'},
       {name:'Prüfpflichten ist als eigene Fach-App mit drei Bereichen aktiviert',passed:(()=>{const compliance=appFor('pruefpflichten');return compliance?.enabled!==false&&JSON.stringify(compliance?.navigation?.map(item=>item.id))===JSON.stringify(['portfolio','assets','due']);})()},
       {name:'Prüfbefunde ist als eigene Fach-App mit Liste und Neuanlage aktiviert',passed:(()=>{const pb=appFor('pruefbefund');return pb?.enabled!==false&&JSON.stringify(pb?.navigation?.map(item=>item.id))===JSON.stringify(['liste','neu']);})()},
-      {name:'BSB ist als eigene Fach-App aktiviert',passed:(()=>{const bsb=appFor('bsb');return bsb?.enabled!==false&&bsb?.navigation?.[0]?.page==='bsb';})()},
+      {name:'BSB ist als eigene Fach-App mit feldtauglicher Vierpunkt-Navigation aktiviert',passed:(()=>{const bsb=appFor('bsb');return bsb?.enabled!==false&&JSON.stringify(bsb?.navigation?.map(item=>item.id))===JSON.stringify(['today','objects','findings','more'])&&bsb?.navigation?.every(item=>item.page==='bsb');})()},
       {name:'E-Mails ist als eigene Fach-App mit Posteingang und Gesendet aktiviert',passed:(()=>{const mail=appFor('emails');return mail?.enabled!==false&&JSON.stringify(mail?.navigation?.map(item=>item.id))===JSON.stringify(['inbox','sent']);})()},
       {name:'Weitere geplante Fachmodule bleiben registriert',passed:comingSoonApps().length>=3}
     ];

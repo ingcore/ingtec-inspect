@@ -27,22 +27,32 @@
   function currentUrl(){
     try{return new URL(window.location.href);}catch(error){return null;}
   }
-  function routeUrl(context){
+  function routeUrl(context,{clearBsbContext=false}={}){
     const url=currentUrl();
     if(!url||!isAppContext(context))return null;
     url.searchParams.delete('hub');
     url.searchParams.delete('collab');
+    // Ein Wechsel zwischen den vier BSB-Hauptbereichen ist eine neue
+    // Fachnavigation. Der bisherige Objekt-/Begehungs-Deep-Link darf dabei
+    // nicht versehentlich den angeklickten Bereich überschreiben. Normale
+    // Render- und Reload-Pfade übergeben dieses Flag nicht und behalten ihren
+    // BSB-Kontext vollständig bei.
+    if(clearBsbContext&&context.app?.id==='bsb'){
+      ['bsb-screen','bsb-customer','bsb-object','bsb-inspection','bsb-finding','bsb-report','bsb-filter','bsb-status'].forEach(key=>url.searchParams.delete(key));
+    }
     url.hash=context.hash;
     return url;
   }
-  function routeMatches(context){
-    const url=routeUrl(context);
+  function routeMatches(context,options={}){
+    const url=routeUrl(context,options);
     if(!url)return false;
-    return url.hash===window.location.hash&&url.searchParams.get('hub')!=='1'&&!new URL(window.location.href).searchParams.has('collab');
+    const current=currentUrl();
+    return Boolean(current&&url.hash===current.hash&&url.search===current.search&&url.searchParams.get('hub')!=='1'&&!current.searchParams.has('collab'));
   }
-  function writeRoute(context,{replace=false}={}){
-    const url=routeUrl(context);
-    if(!url||routeMatches(context))return false;
+  function writeRoute(context,{replace=false,clearBsbContext=false}={}){
+    const options={clearBsbContext};
+    const url=routeUrl(context,options);
+    if(!url||routeMatches(context,options))return false;
     try{
       window.history[replace?'replaceState':'pushState'](
         {ingtecApp:context.app.id,ingtecAppNavigation:context.item.id},
@@ -207,9 +217,9 @@
   }
   let baseSetPage=null;
   let baseNavHtml=null;
-  function applyContext(context,{history=false,replace=false,focus=false}={}){
+  function applyContext(context,{history=false,replace=false,focus=false,clearBsbContext=false}={}){
     if(!isAppContext(context)||!contextIsAllowed(context))return false;
-    if(history)writeRoute(context,{replace});
+    if(history)writeRoute(context,{replace,clearBsbContext});
     setContext(context);
     applyScreenAdapter(context.item);
     refreshNavigation();
@@ -236,7 +246,7 @@
       window.showToast?.(availability.reason,null,null,'error');
       return false;
     }
-    return applyContext(context,{history:options.history!==false,replace:Boolean(options.replace),focus:Boolean(options.focus)});
+    return applyContext(context,{history:options.history!==false,replace:Boolean(options.replace),focus:Boolean(options.focus),clearBsbContext:context.app?.id==='bsb'});
   }
   function navigateItem(navigationId){
     const app=activeApp();
@@ -251,6 +261,13 @@
     // Fall darf der Lifecycle den bewussten Hub-Einstieg nicht in eine
     // Fachroute umschreiben.
     if(requested.kind==='hub'||document.body.classList.contains('ingtec-hub-open'))return false;
+    // Die BSB-Unterroute schreibt ihre eigene, fachliche Browser-History.
+    // Während deren popstate-Renderlauf darf die globale Shell nicht noch den
+    // zuvor aktiven BSB-Tab zurück in die URL schreiben.
+    if(page==='bsb'&&history.state?.ingtecBsbView){
+      window.requestAnimationFrame(updatePresentation);
+      return true;
+    }
     let context=activeContext();
     if(!isAppContext(context)||context.item.page!==page){
       context=contextForPage(page);
