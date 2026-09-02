@@ -1,4 +1,4 @@
-const CACHE_VERSION='ingtec-inspect-v2.5.49';
+const CACHE_VERSION='ingtec-inspect-v2.5.50';
 const APP_SHELL=[
   './',
   './index.html',
@@ -39,7 +39,14 @@ const APP_SHELL_PATHS=new Set(APP_SHELL.map(path=>new URL(path,self.location).pa
 const APP_ENTRY_PATHS=new Set(['./','./index.html'].map(path=>new URL(path,self.location).pathname));
 
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE_VERSION).then(async cache=>{
+    await Promise.all(APP_SHELL.map(async path=>{
+      const request=new Request(new URL(path,self.location).href,{cache:'reload'});
+      const response=await fetch(request);
+      if(!response.ok)throw new Error(`Unable to precache ${path}: ${response.status}`);
+      await cache.put(request,response);
+    }));
+  }).then(()=>self.skipWaiting()));
 });
 
 self.addEventListener('activate',event=>{
@@ -60,8 +67,8 @@ self.addEventListener('fetch',event=>{
   // API-, Download- und personenbezogene Dokumentantworten bleiben außerhalb
   // des Cache und unterliegen damit ausschließlich den Serverregeln.
   if(!APP_SHELL_PATHS.has(url.pathname))return;
-  // Versionierte Asset-URLs (zum Beispiel ?v=...) muessen offline weiterhin
-  // die passende vorgecachte App-Shell-Datei aufloesen.
-  const cachedAsset=caches.match(request,{ignoreSearch:true});
+  // Versionierte Asset-URLs brauchen eigene Cache-Eintraege, damit ein neuer
+  // Build nicht versehentlich eine aeltere Datei mit demselben Pfad erhaelt.
+  const cachedAsset=caches.match(request);
   event.respondWith(cachedAsset.then(cached=>cached||fetch(request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE_VERSION).then(cache=>cache.put(request,copy));}return response;})));
 });

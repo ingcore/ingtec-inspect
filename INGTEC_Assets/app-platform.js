@@ -423,7 +423,7 @@
     document.body.appendChild(panel);
   },800);
   if(location.protocol!=='file:'&&'serviceWorker' in navigator){
-    navigator.serviceWorker.register('./service-worker.js')
+    navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'})
       .then(()=>navigator.serviceWorker.ready)
       .then(()=>{document.documentElement.dataset.serviceWorker='ready';})
       .catch(error=>{document.documentElement.dataset.serviceWorker='failed';console.warn('[INGTEC] Service Worker nicht registriert',error);});
